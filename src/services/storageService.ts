@@ -90,7 +90,7 @@ export const StorageService = {
     localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
   },
 
-  startFasting(targetHours = 16): FastingSession {
+  startFasting(targetHours = 16, customStartTimeIso?: string): FastingSession {
     const sessions = this.getSessions().map(s => {
       if (s.status === 'IN_PROGRESS') {
         return { ...s, status: 'BROKEN' as const, endTime: new Date().toISOString() };
@@ -101,7 +101,7 @@ export const StorageService = {
     const newSession: FastingSession = {
       sessionId: `session_${Date.now()}`,
       userId: 'user_local',
-      startTime: new Date().toISOString(),
+      startTime: customStartTimeIso || new Date().toISOString(),
       endTime: null,
       targetDurationHours: targetHours,
       status: 'IN_PROGRESS',

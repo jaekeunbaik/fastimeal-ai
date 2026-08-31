@@ -4,6 +4,7 @@ import { BottomNavigation, NavTab } from './components/layout/BottomNavigation';
 import { MetabolicRingTimer } from './components/timer/MetabolicRingTimer';
 import { StageDetailsModal } from './components/timer/StageDetailsModal';
 import { FastingPlanSelector } from './components/timer/FastingPlanSelector';
+import { StartFastingModal } from './components/timer/StartFastingModal';
 import { WaterTracker } from './components/water/WaterTracker';
 import { MealTimeline } from './components/meal/MealTimeline';
 import { MealUploaderModal } from './components/meal/MealUploaderModal';
@@ -37,6 +38,7 @@ export function App() {
   const [isUploaderModalOpen, setIsUploaderModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+  const [isStartModalOpen, setIsStartModalOpen] = useState(false);
 
   // Fasting timer hook
   const {
@@ -131,7 +133,7 @@ export function App() {
                 currentStage={currentStage}
                 currentTheme={currentTheme}
                 firstMealTime={userProfile.firstMealTime || '11:30'}
-                onStartFasting={startFasting}
+                onStartFasting={() => setIsStartModalOpen(true)}
                 onStopFasting={stopFasting}
                 onOpenStageDetails={() => setIsStageModalOpen(true)}
                 onOpenPlanSelector={() => setIsPlanModalOpen(true)}
@@ -246,6 +248,17 @@ export function App() {
           currentFirstMealTime={userProfile.firstMealTime || '11:30'}
           currentTheme={currentTheme}
           onSelectPlan={handleSelectPlan}
+        />
+
+        <StartFastingModal
+          isOpen={isStartModalOpen}
+          onClose={() => setIsStartModalOpen(false)}
+          targetHours={targetHours}
+          firstMealTime={userProfile.firstMealTime || '11:30'}
+          currentTheme={currentTheme}
+          onConfirmStart={(startTimeIso, hours) => {
+            startFasting(hours, startTimeIso);
+          }}
         />
 
         <MealUploaderModal

@@ -45,8 +45,8 @@ export function useFastingTimer() {
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const startFasting = useCallback((hours = 16) => {
-    const newSession = StorageService.startFasting(hours);
+  const startFasting = useCallback((hours = 16, customStartTimeIso?: string) => {
+    const newSession = StorageService.startFasting(hours, customStartTimeIso);
     setActiveSession(newSession);
   }, []);
 
