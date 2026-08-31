@@ -17,6 +17,7 @@ import { AdBanner } from './components/ads/AdBanner';
 
 import { useFastingTimer } from './hooks/useFastingTimer';
 import { StorageService } from './services/storageService';
+import { AdMobService } from './services/adMobService';
 import { FastingPlan, MealLog, UserProfile, FastingSession, AppTheme, BodyLog } from './types';
 import { THEMES } from './constants/themes';
 
@@ -99,6 +100,16 @@ export function App() {
   const handleRefreshBodyLogs = () => {
     setBodyLogs(StorageService.getBodyLogs());
   };
+
+  // Initial data load
+  useEffect(() => {
+    setUserProfile(StorageService.getUserProfile());
+    setBodyLogs(StorageService.getBodyLogs());
+    setMeals(StorageService.getMeals());
+    setSessions(StorageService.getSessions());
+    setTodayWaterMl(StorageService.getTodayWaterTotal());
+    AdMobService.initialize();
+  }, []);
 
   return (
     <div className={`min-h-screen ${themeConfig.bgClass} flex flex-col items-center selection:bg-purple-300 selection:text-purple-900 font-sans antialiased transition-colors duration-300`}>
