@@ -93,7 +93,7 @@ export const MealUploaderModal: React.FC<MealUploaderModalProps> = ({
       }
     };
 
-    StorageService.addMealLog(newMeal);
+    StorageService.addMeal(newMeal);
     onMealAdded(newMeal);
     handleClose();
   };

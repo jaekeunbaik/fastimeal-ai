@@ -269,7 +269,7 @@ export function App() {
           onClose={() => setIsUploaderModalOpen(false)}
           currentTheme={currentTheme}
           onMealAdded={(meal) => {
-            setMealLogs(StorageService.getMealLogs());
+            setMeals(StorageService.getMeals());
             setIsUploaderModalOpen(false);
           }}
         />
