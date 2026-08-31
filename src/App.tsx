@@ -267,10 +267,11 @@ export function App() {
         <MealUploaderModal
           isOpen={isUploaderModalOpen}
           onClose={() => setIsUploaderModalOpen(false)}
-          fastingState={fastingState}
-          elapsedHours={elapsedHours}
-          onMealAdded={handleMealAdded}
-          onStopFastingRequest={stopFasting}
+          currentTheme={currentTheme}
+          onMealAdded={(meal) => {
+            setMealLogs(StorageService.getMealLogs());
+            setIsUploaderModalOpen(false);
+          }}
         />
 
         <ThemeSelectorModal

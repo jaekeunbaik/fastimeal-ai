@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { X, Camera, Image, Utensils, Check, Flame, Clock } from 'lucide-react';
-import { MealLog, AppTheme, MealType } from '../../types';
+import { X, Camera, Image, Check } from 'lucide-react';
+import { MealLog, AppTheme } from '../../types';
 import { StorageService } from '../../services/storageService';
 
 interface MealUploaderModalProps {
@@ -10,11 +10,11 @@ interface MealUploaderModalProps {
   onMealAdded: (meal: MealLog) => void;
 }
 
-const MEAL_TYPES: { type: MealType; label: string; emoji: string }[] = [
-  { type: 'LUNCH', label: '점심', emoji: '🍱' },
-  { type: 'DINNER', label: '저녁', emoji: '🥗' },
-  { type: 'BREAKFAST', label: '아침', emoji: '🍳' },
-  { type: 'SNACK', label: '간식/음료', emoji: '☕' },
+const MEAL_TYPES: { type: 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'drink'; label: string; emoji: string }[] = [
+  { type: 'lunch', label: '점심', emoji: '🍱' },
+  { type: 'dinner', label: '저녁', emoji: '🥗' },
+  { type: 'breakfast', label: '아침', emoji: '🍳' },
+  { type: 'snack', label: '간식/음료', emoji: '☕' },
 ];
 
 export const MealUploaderModal: React.FC<MealUploaderModalProps> = ({
@@ -24,7 +24,7 @@ export const MealUploaderModal: React.FC<MealUploaderModalProps> = ({
   onMealAdded,
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [mealType, setMealType] = useState<MealType>('LUNCH');
+  const [mealType, setMealType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack' | 'drink'>('lunch');
   const [menuName, setMenuName] = useState('');
   const [calories, setCalories] = useState('650');
   const [carbs, setCarbs] = useState('65');
@@ -54,23 +54,46 @@ export const MealUploaderModal: React.FC<MealUploaderModalProps> = ({
       return;
     }
 
+    const cNum = Number(calories) || 500;
+    const carbsNum = Number(carbs) || 50;
+    const proteinNum = Number(protein) || 25;
+    const fatNum = Number(fat) || 15;
+    const finalMenuName = menuName.trim() || `${MEAL_TYPES.find(m => m.type === mealType)?.label || '식사'} 기록`;
+
     const newMeal: MealLog = {
-      mealId: `meal_${Date.now()}`,
+      logId: `meal_${Date.now()}`,
       userId: 'user_local',
-      imageUrl: selectedImage || undefined,
+      imageUrl: selectedImage || '',
+      consumedAt: new Date().toISOString(),
+      isDuringFasting: false,
       mealType,
-      menuName: menuName.trim() || `${MEAL_TYPES.find(m => m.type === mealType)?.label || '식사'} 기록`,
-      calories: Number(calories) || 500,
-      carbs: Number(carbs) || 50,
-      protein: Number(protein) || 25,
-      fat: Number(fat) || 15,
-      glycemicSpikeRisk: 'LOW',
-      isFastingBroken: false,
-      aiCoachComment: memo.trim() || '영양 밸런스를 맞춘 식단 기록입니다.',
-      loggedAt: new Date().toISOString(),
+      aiAnalysis: {
+        foods: [
+          {
+            name: finalMenuName,
+            portion: '1인분',
+            calories: cNum,
+            carbs_g: carbsNum,
+            protein_g: proteinNum,
+            fat_g: fatNum,
+          }
+        ],
+        total_nutrition: {
+          calories: cNum,
+          carbs_g: carbsNum,
+          protein_g: proteinNum,
+          fat_g: fatNum,
+        },
+        sugar_spike_risk: 'LOW',
+        fasting_impact: {
+          breaks_fast: false,
+          status_message: '식사 윈도우 식단',
+        },
+        ai_coach_comment: memo.trim() || '영양 밸런스를 맞춘 식단 기록입니다.',
+      }
     };
 
-    StorageService.saveMeal(newMeal);
+    StorageService.addMealLog(newMeal);
     onMealAdded(newMeal);
     handleClose();
   };
