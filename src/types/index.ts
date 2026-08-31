@@ -25,6 +25,9 @@ export interface MetabolicStage {
 export interface UserProfile {
   userId: string;
   nickname: string;
+  heightCm?: number; // e.g. 168
+  startWeightKg?: number; // e.g. 65.0
+  targetWeightKg?: number; // e.g. 55.0
   fastingPlan: FastingPlan;
   targetFastingHours: number;
   targetStartHour: number; // e.g. 20 (20:00)
@@ -34,6 +37,7 @@ export interface UserProfile {
   apiKey?: string; // Gemini or OpenAI API Key
   aiProvider: 'gemini' | 'openai';
   theme: AppTheme;
+  isOnboarded: boolean;
 }
 
 export interface FastingSession {

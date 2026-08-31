@@ -9,6 +9,9 @@ const BODY_LOGS_KEY = 'fastimeal_body_logs';
 export const DEFAULT_USER: UserProfile = {
   userId: 'user_local',
   nickname: '',
+  heightCm: undefined,
+  startWeightKg: undefined,
+  targetWeightKg: undefined,
   fastingPlan: '16:8',
   targetFastingHours: 16,
   targetStartHour: 20, // 20:00 단식 시작
@@ -18,6 +21,7 @@ export const DEFAULT_USER: UserProfile = {
   aiProvider: 'gemini',
   apiKey: '',
   theme: 'pastel',
+  isOnboarded: false,
 };
 
 export const INITIAL_MEALS: MealLog[] = [

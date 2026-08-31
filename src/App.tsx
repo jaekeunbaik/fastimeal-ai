@@ -11,6 +11,7 @@ import { DailyStatsSummary } from './components/stats/DailyStatsSummary';
 import { BodyCalendarView } from './components/calendar/BodyCalendarView';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { ThemeSelectorModal } from './components/theme/ThemeSelectorModal';
+import { OnboardingModal } from './components/onboarding/OnboardingModal';
 
 import { useFastingTimer } from './hooks/useFastingTimer';
 import { StorageService } from './services/storageService';
@@ -259,6 +260,16 @@ export function App() {
           isOpen={isSettingsModalOpen}
           onClose={() => setIsSettingsModalOpen(false)}
           onProfileUpdated={setUserProfile}
+        />
+
+        {/* First-launch Onboarding Wizard (Nickname, Height, Weight, BMI) */}
+        <OnboardingModal
+          isOpen={!userProfile.isOnboarded}
+          currentTheme={currentTheme}
+          onComplete={(profile) => {
+            setUserProfile(profile);
+            setBodyLogs(StorageService.getBodyLogs());
+          }}
         />
       </div>
     </div>

@@ -99,6 +99,40 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <div className="grid grid-cols-2 gap-2.5">
               <div>
+                <label className="text-[11px] text-slate-500 font-semibold block mb-1">나의 키 (cm)</label>
+                <input
+                  type="number"
+                  step="0.5"
+                  placeholder="165"
+                  value={profile.heightCm || ''}
+                  onChange={(e) => setProfile({ ...profile, heightCm: Number(e.target.value) })}
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all focus:outline-none ${
+                    isLight
+                      ? 'bg-white border border-slate-200 text-slate-800 focus:border-purple-500 shadow-xs'
+                      : 'bg-slate-800/80 border border-slate-700 text-white focus:border-blue-500'
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] text-slate-500 font-semibold block mb-1">목표 체중 (kg)</label>
+                <input
+                  type="number"
+                  step="0.1"
+                  placeholder="55.0"
+                  value={profile.targetWeightKg || ''}
+                  onChange={(e) => setProfile({ ...profile, targetWeightKg: Number(e.target.value) })}
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all focus:outline-none ${
+                    isLight
+                      ? 'bg-white border border-slate-200 text-slate-800 focus:border-purple-500 shadow-xs'
+                      : 'bg-slate-800/80 border border-slate-700 text-white focus:border-blue-500'
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <div>
                 <label className="text-[11px] text-slate-500 font-semibold block mb-1 flex items-center">
                   <Droplets className="w-3.5 h-3.5 text-cyan-500 mr-1" /> 하루 물 목표 (ml)
                 </label>
