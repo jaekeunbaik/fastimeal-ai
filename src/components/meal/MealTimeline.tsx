@@ -1,7 +1,7 @@
 import React from 'react';
 import { MealLog, AppTheme } from '../../types';
 import { MealDetailCard } from './MealDetailCard';
-import { PlusCircle, Utensils, Sparkles, Flame } from 'lucide-react';
+import { PlusCircle, Utensils, Sparkles, Flame, Plus } from 'lucide-react';
 import { THEMES } from '../../constants/themes';
 
 interface MealTimelineProps {
