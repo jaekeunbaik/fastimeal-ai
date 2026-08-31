@@ -4,7 +4,7 @@ import { getMetabolicStage } from '../constants/metabolism';
 import { StorageService } from '../services/storageService';
 import confetti from 'canvas-confetti';
 
-export function useFastingTimer() {
+export function useFastingTimer(defaultTargetHours: number = 16) {
   const [activeSession, setActiveSession] = useState<FastingSession | null>(() => StorageService.getActiveSession());
   const [now, setNow] = useState<number>(Date.now());
 
@@ -25,7 +25,7 @@ export function useFastingTimer() {
   const elapsedSeconds = Math.floor(elapsedMs / 1000);
   const elapsedHours = elapsedSeconds / 3600;
 
-  const targetHours = activeSession?.targetDurationHours || 16;
+  const targetHours = activeSession?.targetDurationHours || defaultTargetHours || 16;
   const targetMs = targetHours * 3600 * 1000;
   const remainingMs = Math.max(0, targetMs - elapsedMs);
   const remainingSeconds = Math.floor(remainingMs / 1000);
