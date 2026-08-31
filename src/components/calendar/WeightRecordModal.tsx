@@ -35,9 +35,8 @@ export const WeightRecordModal: React.FC<WeightRecordModalProps> = ({
         setMemo(log.memo || '');
       } else {
         setExistingLog(null);
-        // 이전 최신 몸무게가 있으면 가이드로 활용
-        const allLogs = StorageService.getBodyLogs();
-        setWeight(allLogs[0]?.weightKg ? allLogs[0].weightKg.toString() : '');
+        // 기록이 없는 날짜는 빈칸으로 시작
+        setWeight('');
         setBodyFat('');
         setMuscle('');
         setMemo('');
@@ -122,14 +121,14 @@ export const WeightRecordModal: React.FC<WeightRecordModalProps> = ({
               <input
                 type="number"
                 step="0.1"
-                placeholder="60.0"
+                placeholder="예: 60.0"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 autoFocus
-                className={`w-36 text-center text-3xl font-extrabold font-mono py-1 rounded-xl transition-all focus:outline-none ${
+                className={`w-40 text-center text-3xl font-extrabold font-mono py-1 rounded-xl transition-all focus:outline-none ${
                   isLight
-                    ? 'bg-white border-2 border-purple-300 text-slate-800 focus:border-purple-500 shadow-sm'
-                    : 'bg-slate-800 border-2 border-slate-700 text-white focus:border-purple-400'
+                    ? 'bg-white border-2 border-purple-300 text-purple-900 focus:border-purple-600 shadow-xs'
+                    : 'bg-slate-800 border-2 border-purple-500/50 text-white focus:border-purple-400'
                 }`}
               />
               <span className="text-lg font-bold text-slate-500">kg</span>
