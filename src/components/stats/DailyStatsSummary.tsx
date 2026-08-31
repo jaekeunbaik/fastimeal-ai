@@ -171,7 +171,7 @@ export const DailyStatsSummary: React.FC<DailyStatsSummaryProps> = ({
         </div>
       </div>
 
-      {/* AI Daily Metabolic Insight */}
+      {/* Daily Metabolic Summary Card */}
       <div className={`glass-card rounded-3xl p-4.5 border ${
         currentTheme === 'pastel'
           ? 'bg-purple-50/70 border-purple-200 text-slate-700'
@@ -183,7 +183,7 @@ export const DailyStatsSummary: React.FC<DailyStatsSummaryProps> = ({
           currentTheme === 'pastel' ? 'text-purple-700' : isLight ? 'text-blue-700' : 'text-blue-300'
         }`}>
           <Sparkles className="w-4 h-4" />
-          <span>FastiMeal AI 일일 코칭 총평</span>
+          <span>오늘의 영양 & 대사 밸런스 총평</span>
         </div>
         <p className="text-xs leading-relaxed">
           {proteinPct >= 30

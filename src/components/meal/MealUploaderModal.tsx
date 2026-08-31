@@ -322,13 +322,13 @@ export const MealUploaderModal: React.FC<MealUploaderModalProps> = ({
                   </div>
                 </div>
 
-                {/* AI Coach Comment */}
-                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border border-blue-500/20">
-                  <div className="flex items-center space-x-1.5 text-xs font-bold text-blue-300 mb-1">
+                {/* Nutrition Summary Note */}
+                <div className="p-3.5 rounded-2xl bg-purple-50/70 dark:bg-blue-950/30 border border-purple-200 dark:border-blue-500/20">
+                  <div className="flex items-center space-x-1.5 text-xs font-bold text-purple-700 dark:text-blue-300 mb-1">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>FastiMeal AI 다이어티션 피드백</span>
+                    <span>영양 & 대사 분석 가이드</span>
                   </div>
-                  <p className="text-xs text-slate-200 leading-relaxed">
+                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
                     {analysisResult.ai_coach_comment}
                   </p>
                 </div>

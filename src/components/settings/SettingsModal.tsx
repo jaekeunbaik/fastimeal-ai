@@ -195,8 +195,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-xs font-bold">스마트 Vision AI 코칭</h4>
-                <p className="text-[10px] text-slate-500">음식 사진 촬영 시 칼로리 & 혈당 스파이크 자동 분석</p>
+                <h4 className="text-xs font-bold">스마트 사진 식단 & 영양 분석</h4>
+                <p className="text-[10px] text-slate-500">음식 사진 촬영 시 메뉴, 칼로리, 혈당 스파이크 자동 분석</p>
               </div>
             </div>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">

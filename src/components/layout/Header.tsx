@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
           <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-            대사 5단계 & 스마트 AI 코칭
+            대사 5단계 & 간헐적 단식 다이어리
           </p>
         </div>
       </div>
