@@ -91,8 +91,8 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
           isLight ? 'bg-purple-50/60 border-purple-100 text-slate-600 hover:bg-purple-50' : 'bg-white/5 border-white/5 text-slate-300'
         }`}
       >
-        <span className="flex items-center space-x-1.5">
-          <span className={`w-2 h-2 rounded-full animate-ping ${isFasting ? 'bg-purple-500' : 'bg-emerald-500'}`} />
+        <span className="flex items-center space-x-1.5 font-bold">
+          <span className={`w-2 h-2 rounded-full ${isFasting ? 'bg-purple-600' : 'bg-emerald-600'}`} />
           <span>{isFasting ? '🌙 자동 단식 구간' : '🍱 자동 식사창 구간'}</span>
         </span>
         <span className="flex items-center space-x-1 font-mono font-bold">
@@ -167,7 +167,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
                   border: `1px solid ${stageColor}40`,
                 }}
               >
-                <Flame className="w-3 h-3 animate-pulse" />
+                <Flame className="w-3 h-3" />
                 <span>{currentStage.name}</span>
               </div>
 
@@ -245,7 +245,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
                   isPassed
                     ? 'opacity-90'
                     : isCurrent
-                    ? 'ring-2 ring-purple-400 dark:ring-white animate-pulse'
+                    ? 'ring-2 ring-purple-400 dark:ring-white scale-105'
                     : isLight ? 'bg-slate-200' : 'bg-slate-800'
                 }`}
                 style={{

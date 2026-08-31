@@ -56,26 +56,25 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right controls */}
       <div className="flex items-center space-x-2">
-        {/* Fasting / Eating Badge */}
-        <button
+        {/* Fasting / Eating Status Tag */}
+        <div 
           onClick={onOpenStages}
-          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-            isFasting
-              ? currentTheme === 'pastel'
-                ? 'bg-purple-100 text-purple-700 border border-purple-300 hover:bg-purple-200'
-                : isLight
-                ? 'bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200'
-                : 'bg-blue-500/15 text-blue-400 border border-blue-500/30 hover:bg-blue-500/25'
-              : currentTheme === 'pastel'
-              ? 'bg-pink-100 text-pink-700 border border-pink-300 hover:bg-pink-200'
-              : isLight
-              ? 'bg-emerald-100 text-emerald-700 border border-emerald-300 hover:bg-emerald-200'
-              : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25'
-          }`}
-        >
-          <span className="w-2 h-2 rounded-full animate-ping bg-current" />
-          <span>{isFasting ? '단식 중' : '식사 윈도우'}</span>
-        </button>
+          className={`cursor-pointer px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center space-x-1.5 border transition-all ${
+          isFasting
+            ? currentTheme === 'pastel'
+              ? 'bg-purple-100/90 text-purple-700 border-purple-200 shadow-xs'
+              : currentTheme === 'wood'
+              ? 'bg-[#ebdcd0] text-[#6e5d4f] border-[#ddcdbf]'
+              : currentTheme === 'mono'
+              ? 'bg-zinc-200 text-black border-zinc-300'
+              : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+            : isLight
+            ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+            : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+        }`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${isFasting ? 'bg-purple-600 dark:bg-blue-400' : 'bg-emerald-500'}`} />
+          <span>{isFasting ? '단식 중' : '식사 가능'}</span>
+        </div>
 
         {/* Theme Switcher Quick Icon */}
         <button
