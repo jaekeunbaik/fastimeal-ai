@@ -16,6 +16,7 @@ export const DEFAULT_USER: UserProfile = {
   dailyCalorieTarget: 1800,
   aiProvider: 'gemini',
   apiKey: '',
+  theme: 'pastel',
 };
 
 export const INITIAL_MEALS: MealLog[] = [

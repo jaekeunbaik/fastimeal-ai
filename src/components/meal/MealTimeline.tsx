@@ -1,20 +1,25 @@
 import React from 'react';
-import { MealLog } from '../../types';
+import { MealLog, AppTheme } from '../../types';
 import { MealDetailCard } from './MealDetailCard';
 import { PlusCircle, Utensils, Sparkles, Flame } from 'lucide-react';
+import { THEMES } from '../../constants/themes';
 
 interface MealTimelineProps {
   meals: MealLog[];
+  currentTheme?: AppTheme;
   onDeleteMeal: (logId: string) => void;
   onOpenUploader: () => void;
 }
 
 export const MealTimeline: React.FC<MealTimelineProps> = ({
   meals,
+  currentTheme = 'pastel',
   onDeleteMeal,
   onOpenUploader,
 }) => {
-  // 오늘 날짜 기준 식사만 계산 (또는 전체)
+  const isLight = currentTheme !== 'dark';
+  const theme = THEMES[currentTheme] || THEMES.pastel;
+
   const totalCalories = meals.reduce((sum, m) => sum + (m.aiAnalysis?.total_nutrition?.calories || 0), 0);
   const totalCarbs = meals.reduce((sum, m) => sum + (m.aiAnalysis?.total_nutrition?.carbs_g || 0), 0);
   const totalProtein = meals.reduce((sum, m) => sum + (m.aiAnalysis?.total_nutrition?.protein_g || 0), 0);
@@ -25,16 +30,26 @@ export const MealTimeline: React.FC<MealTimelineProps> = ({
       {/* Header & Total Summary Bar */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center">
-            <Utensils className="w-4 h-4 text-blue-400 mr-2" />
+          <h2 className={`text-lg font-bold flex items-center ${isLight ? 'text-slate-800' : 'text-white'}`}>
+            <Utensils className={`w-4 h-4 mr-2 ${currentTheme === 'pastel' ? 'text-purple-600' : 'text-blue-500'}`} />
             사진 식단 타임라인
           </h2>
-          <p className="text-xs text-slate-400">타임스탬프 순 자동 정렬 및 AI 영양 분석 피드</p>
+          <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+            타임스탬프 순 자동 정렬 및 AI 영양 분석 피드
+          </p>
         </div>
 
         <button
           onClick={onOpenUploader}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-md shadow-blue-500/20 transition-all active:scale-95"
+          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-2xl text-white text-xs font-semibold shadow-md transition-all active:scale-95 ${
+            currentTheme === 'pastel'
+              ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/20'
+              : currentTheme === 'wood'
+              ? 'bg-[#8a6240] hover:bg-[#735134] shadow-amber-900/20'
+              : currentTheme === 'mono'
+              ? 'bg-slate-900 hover:bg-slate-800'
+              : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/20'
+          }`}
         >
           <PlusCircle className="w-3.5 h-3.5" />
           <span>기록 추가</span>
@@ -43,27 +58,33 @@ export const MealTimeline: React.FC<MealTimelineProps> = ({
 
       {/* Daily Nutrition Macro Bar */}
       {meals.length > 0 && (
-        <div className="glass-card rounded-2xl p-3.5 mb-4 border border-white/10">
+        <div className="glass-card rounded-3xl p-4 mb-4">
           <div className="flex items-center justify-between text-xs mb-2">
-            <span className="font-semibold text-slate-300">오늘 총 섭취 영양</span>
-            <span className="text-orange-400 font-mono font-bold flex items-center">
+            <span className={`font-bold ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>오늘 총 섭취 영양</span>
+            <span className="text-orange-500 font-mono font-bold flex items-center">
               <Flame className="w-3.5 h-3.5 mr-0.5" />
               {totalCalories} kcal
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-center text-[11px]">
-            <div className="p-1.5 rounded-lg bg-white/5">
-              <span className="text-slate-400 text-[10px]">탄수화물</span>
-              <p className="font-bold text-blue-400 font-mono">{totalCarbs}g</p>
+          <div className="grid grid-cols-3 gap-2 text-center text-xs">
+            <div className={`p-2 rounded-2xl border ${
+              isLight ? 'bg-purple-50/50 border-purple-100' : 'bg-white/5 border-white/5'
+            }`}>
+              <span className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>탄수화물</span>
+              <p className="font-bold text-blue-500 font-mono">{totalCarbs}g</p>
             </div>
-            <div className="p-1.5 rounded-lg bg-white/5">
-              <span className="text-slate-400 text-[10px]">단백질</span>
-              <p className="font-bold text-emerald-400 font-mono">{totalProtein}g</p>
+            <div className={`p-2 rounded-2xl border ${
+              isLight ? 'bg-emerald-50/50 border-emerald-100' : 'bg-white/5 border-white/5'
+            }`}>
+              <span className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>단백질</span>
+              <p className="font-bold text-emerald-600 font-mono">{totalProtein}g</p>
             </div>
-            <div className="p-1.5 rounded-lg bg-white/5">
-              <span className="text-slate-400 text-[10px]">지방</span>
-              <p className="font-bold text-pink-400 font-mono">{totalFat}g</p>
+            <div className={`p-2 rounded-2xl border ${
+              isLight ? 'bg-pink-50/50 border-pink-100' : 'bg-white/5 border-white/5'
+            }`}>
+              <span className={`text-[10px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>지방</span>
+              <p className="font-bold text-pink-500 font-mono">{totalFat}g</p>
             </div>
           </div>
         </div>
@@ -71,17 +92,25 @@ export const MealTimeline: React.FC<MealTimelineProps> = ({
 
       {/* Meals Feed */}
       {meals.length === 0 ? (
-        <div className="text-center py-12 px-4 glass-card rounded-3xl border border-dashed border-slate-700 my-4">
-          <div className="w-14 h-14 mx-auto rounded-full bg-blue-500/10 text-blue-400 flex items-center justify-center mb-3">
+        <div className={`text-center py-12 px-4 glass-card rounded-3xl border border-dashed my-4 ${
+          isLight ? 'border-purple-200' : 'border-slate-700'
+        }`}>
+          <div className={`w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-3 ${
+            isLight ? 'bg-purple-100 text-purple-600' : 'bg-blue-500/10 text-blue-400'
+          }`}>
             <Sparkles className="w-7 h-7" />
           </div>
-          <h3 className="text-base font-bold text-white mb-1">아직 기록된 식단이 없습니다</h3>
-          <p className="text-xs text-slate-400 max-w-xs mx-auto mb-4 leading-relaxed">
+          <h3 className={`text-base font-bold mb-1 ${isLight ? 'text-slate-800' : 'text-white'}`}>
+            아직 기록된 식단이 없습니다
+          </h3>
+          <p className={`text-xs max-w-xs mx-auto mb-4 leading-relaxed ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
             식사 또는 음료 사진을 찍어 올리시면 AI가 자동으로 칼로리와 탄단지를 분석해드립니다.
           </p>
           <button
             onClick={onOpenUploader}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-500/30 transition-transform active:scale-95"
+            className={`px-5 py-2.5 rounded-2xl text-white text-xs font-bold shadow-lg transition-transform active:scale-95 ${
+              currentTheme === 'pastel' ? 'bg-purple-600' : 'bg-blue-600'
+            }`}
           >
             📸 첫 식단 사진 올리기
           </button>
@@ -89,7 +118,12 @@ export const MealTimeline: React.FC<MealTimelineProps> = ({
       ) : (
         <div className="space-y-1">
           {meals.map((meal) => (
-            <MealDetailCard key={meal.logId} meal={meal} onDelete={onDeleteMeal} />
+            <MealDetailCard
+              key={meal.logId}
+              meal={meal}
+              currentTheme={currentTheme}
+              onDelete={onDeleteMeal}
+            />
           ))}
         </div>
       )}

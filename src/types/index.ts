@@ -8,6 +8,8 @@ export type SessionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'BROKEN';
 
 export type SugarSpikeRisk = 'LOW' | 'MEDIUM' | 'HIGH';
 
+export type AppTheme = 'pastel' | 'wood' | 'mono' | 'dark';
+
 export interface MetabolicStage {
   id: number;
   name: string;
@@ -31,6 +33,7 @@ export interface UserProfile {
   dailyCalorieTarget: number;
   apiKey?: string; // Gemini or OpenAI API Key
   aiProvider: 'gemini' | 'openai';
+  theme: AppTheme;
 }
 
 export interface FastingSession {

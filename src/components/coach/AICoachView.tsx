@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Sparkles, MessageCircle, Send, Flame, ShieldAlert, CheckCircle2, Droplets } from 'lucide-react';
-import { FastingState, MetabolicStage, MealLog } from '../../types';
+import { Sparkles, Send } from 'lucide-react';
+import { FastingState, MetabolicStage, MealLog, AppTheme } from '../../types';
+import { THEMES } from '../../constants/themes';
 
 interface AICoachViewProps {
   fastingState: FastingState;
   elapsedHours: number;
   currentStage: MetabolicStage;
+  currentTheme?: AppTheme;
   meals: MealLog[];
   todayWaterMl: number;
 }
@@ -21,10 +23,11 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
   fastingState,
   elapsedHours,
   currentStage,
-  meals,
-  todayWaterMl,
+  currentTheme = 'pastel',
 }) => {
   const isFasting = fastingState === 'FASTING';
+  const isLight = currentTheme !== 'dark';
+  const theme = THEMES[currentTheme] || THEMES.pastel;
 
   const [inputQuery, setInputQuery] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -50,7 +53,6 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
     setMessages(prev => [...prev, userMsg]);
     setInputQuery('');
 
-    // 스마트 AI 응답 생성
     setTimeout(() => {
       let aiReply = '';
       const query = text.toLowerCase();
@@ -79,32 +81,44 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
     <div className="w-full max-w-md mx-auto px-4 py-2 pb-24 space-y-4">
       {/* Header */}
       <div>
-        <h2 className="text-lg font-bold text-white flex items-center">
-          <Sparkles className="w-5 h-5 text-blue-400 mr-2" />
+        <h2 className={`text-lg font-bold flex items-center ${isLight ? 'text-slate-800' : 'text-white'}`}>
+          <Sparkles className={`w-5 h-5 mr-2 ${currentTheme === 'pastel' ? 'text-purple-600' : 'text-blue-500'}`} />
           1:1 AI 다이어티션 코치
         </h2>
-        <p className="text-xs text-slate-400">실시간 생체 대사 단계 기반 맞춤형 영양 & 단식 피드백</p>
+        <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+          실시간 생체 대사 단계 기반 맞춤형 영양 & 단식 피드백
+        </p>
       </div>
 
       {/* Real-time Status Card */}
-      <div className="glass-card rounded-3xl p-4 border border-blue-500/20 bg-gradient-to-r from-[#0f172a] to-[#131f38]">
+      <div className={`glass-card rounded-3xl p-4.5 border transition-all ${
+        currentTheme === 'pastel'
+          ? 'bg-purple-50/80 border-purple-200 shadow-md shadow-purple-500/5'
+          : currentTheme === 'wood'
+          ? 'bg-[#f4ece4] border-[#ebdcd0]'
+          : isLight
+          ? 'bg-slate-50 border-slate-200'
+          : 'bg-gradient-to-r from-[#0f172a] to-[#131f38] border-blue-500/20'
+      }`}>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-slate-300 flex items-center">
-            <span className="w-2 h-2 rounded-full mr-1.5 animate-pulse" style={{ backgroundColor: currentStage.color }} />
+          <span className={`text-xs font-bold flex items-center ${isLight ? 'text-slate-700' : 'text-slate-300'}`}>
+            <span className="w-2.5 h-2.5 rounded-full mr-1.5 animate-pulse" style={{ backgroundColor: currentStage.color }} />
             {isFasting ? `단식 진행 중 (${elapsedHours.toFixed(1)}h)` : '식사 윈도우 진행 중'}
           </span>
-          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: `${currentStage.color}25`, color: currentStage.color }}>
+          <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full" style={{ backgroundColor: `${currentStage.color}25`, color: isLight && currentStage.color === '#f472b6' ? '#db2777' : currentStage.color }}>
             {currentStage.name}
           </span>
         </div>
-        <p className="text-xs text-slate-300 leading-relaxed">
+        <p className={`text-xs leading-relaxed ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>
           {currentStage.shortDesc}
         </p>
       </div>
 
       {/* Suggested Quick Questions */}
       <div>
-        <span className="text-[11px] font-semibold text-slate-400 mb-1.5 block">💡 자주 묻는 질문:</span>
+        <span className={`text-[11px] font-semibold mb-1.5 block ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+          💡 자주 묻는 질문:
+        </span>
         <div className="flex flex-wrap gap-1.5">
           {[
             '지금 너무 배가 고파요 😭',
@@ -115,7 +129,13 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
             <button
               key={idx}
               onClick={() => handleSend(q)}
-              className="text-[11px] px-3 py-1.5 rounded-xl bg-white/5 hover:bg-blue-600/20 border border-white/10 text-slate-300 hover:text-blue-300 hover:border-blue-500/30 transition-all text-left"
+              className={`text-[11px] px-3 py-1.5 rounded-2xl border transition-all text-left ${
+                currentTheme === 'pastel'
+                  ? 'bg-white hover:bg-purple-100/70 border-purple-200 text-slate-700 hover:text-purple-700'
+                  : isLight
+                  ? 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700'
+                  : 'bg-white/5 hover:bg-blue-600/20 border-white/10 text-slate-300'
+              }`}
             >
               {q}
             </button>
@@ -124,21 +144,31 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
       </div>
 
       {/* Chat Messages Log */}
-      <div className="glass-card rounded-3xl p-4 border border-white/10 space-y-3 min-h-[260px] max-h-[380px] overflow-y-auto">
+      <div className={`glass-card rounded-3xl p-4 space-y-3 min-h-[260px] max-h-[380px] overflow-y-auto ${
+        isLight ? 'bg-white/90 border-slate-200/80 shadow-xs' : 'border-white/10'
+      }`}>
         {messages.map((msg) => (
           <div
             key={msg.id}
             className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[85%] p-3.5 rounded-2xl text-xs leading-relaxed ${
+              className={`max-w-[85%] p-3.5 rounded-3xl text-xs leading-relaxed shadow-sm ${
                 msg.sender === 'user'
-                  ? 'bg-blue-600 text-white rounded-br-none shadow-md shadow-blue-500/20'
+                  ? currentTheme === 'pastel'
+                    ? 'bg-purple-600 text-white rounded-br-none'
+                    : currentTheme === 'wood'
+                    ? 'bg-[#8a6240] text-white rounded-br-none'
+                    : 'bg-slate-900 text-white rounded-br-none'
+                  : isLight
+                  ? 'bg-slate-100 text-slate-800 rounded-bl-none border border-slate-200'
                   : 'bg-white/10 text-slate-200 rounded-bl-none border border-white/10'
               }`}
             >
               {msg.sender === 'ai' && (
-                <div className="flex items-center space-x-1 text-[10px] text-blue-300 font-bold mb-1">
+                <div className={`flex items-center space-x-1 text-[10px] font-bold mb-1 ${
+                  currentTheme === 'pastel' ? 'text-purple-600' : isLight ? 'text-blue-600' : 'text-blue-300'
+                }`}>
                   <Sparkles className="w-3 h-3" />
                   <span>FastiMeal AI Dietitian</span>
                 </div>
@@ -157,11 +187,17 @@ export const AICoachView: React.FC<AICoachViewProps> = ({
           value={inputQuery}
           onChange={(e) => setInputQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          className="w-full pl-4 pr-12 py-3 rounded-2xl bg-slate-800/90 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 shadow-xl"
+          className={`w-full pl-4 pr-12 py-3 rounded-2xl text-xs shadow-md focus:outline-none transition-all ${
+            isLight
+              ? 'bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:border-purple-500'
+              : 'bg-slate-800/90 border border-slate-700 text-white placeholder-slate-500 focus:border-blue-500'
+          }`}
         />
         <button
           onClick={() => handleSend()}
-          className="absolute right-2 p-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+          className={`absolute right-2 p-2 rounded-xl text-white transition-colors ${
+            currentTheme === 'pastel' ? 'bg-purple-600 hover:bg-purple-500' : 'bg-blue-600 hover:bg-blue-500'
+          }`}
         >
           <Send className="w-3.5 h-3.5" />
         </button>

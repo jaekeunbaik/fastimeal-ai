@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Header } from './components/layout/Header';
 import { BottomNavigation, NavTab } from './components/layout/BottomNavigation';
 import { MetabolicRingTimer } from './components/timer/MetabolicRingTimer';
@@ -10,10 +10,12 @@ import { MealUploaderModal } from './components/meal/MealUploaderModal';
 import { DailyStatsSummary } from './components/stats/DailyStatsSummary';
 import { AICoachView } from './components/coach/AICoachView';
 import { SettingsModal } from './components/settings/SettingsModal';
+import { ThemeSelectorModal } from './components/theme/ThemeSelectorModal';
 
 import { useFastingTimer } from './hooks/useFastingTimer';
 import { StorageService } from './services/storageService';
-import { FastingPlan, MealLog, UserProfile, FastingSession } from './types';
+import { FastingPlan, MealLog, UserProfile, FastingSession, AppTheme } from './types';
+import { THEMES } from './constants/themes';
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('timer');
@@ -22,11 +24,17 @@ export function App() {
   const [sessions, setSessions] = useState<FastingSession[]>(() => StorageService.getSessions());
   const [todayWaterMl, setTodayWaterMl] = useState<number>(() => StorageService.getTodayWaterTotal());
 
+  // Current active theme (Default: pastel)
+  const currentTheme: AppTheme = userProfile.theme || 'pastel';
+  const themeConfig = THEMES[currentTheme] || THEMES.pastel;
+  const isLight = currentTheme !== 'dark';
+
   // Modals state
   const [isStageModalOpen, setIsStageModalOpen] = useState(false);
   const [isPlanModalOpen, setIsPlanModalOpen] = useState(false);
   const [isUploaderModalOpen, setIsUploaderModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
 
   // Fasting timer hook
   const {
@@ -56,6 +64,13 @@ export function App() {
     StorageService.saveUserProfile(updated);
   };
 
+  // Theme change handler
+  const handleSelectTheme = (theme: AppTheme) => {
+    const updated = { ...userProfile, theme };
+    setUserProfile(updated);
+    StorageService.saveUserProfile(updated);
+  };
+
   // Meal added handler
   const handleMealAdded = (meal: MealLog) => {
     setMeals(StorageService.getMeals());
@@ -68,14 +83,24 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c17] text-slate-100 flex flex-col items-center selection:bg-blue-500 selection:text-white font-sans antialiased">
+    <div className={`min-h-screen ${themeConfig.bgClass} flex flex-col items-center selection:bg-purple-300 selection:text-purple-900 font-sans antialiased transition-colors duration-300`}>
       {/* Mobile Shell Wrapper (Google Play / Mobile native frame) */}
-      <div className="w-full max-w-md min-h-screen flex flex-col bg-[#0a0f1d] shadow-2xl relative border-x border-white/5 pb-20">
+      <div className={`w-full max-w-md min-h-screen flex flex-col shadow-2xl relative border-x transition-colors duration-300 pb-20 ${
+        currentTheme === 'pastel'
+          ? 'bg-[#fcf9fe] border-purple-100 text-slate-800'
+          : currentTheme === 'wood'
+          ? 'bg-[#faf6f0] border-[#ecdcd0] text-[#443627]'
+          : currentTheme === 'mono'
+          ? 'bg-[#f8fafc] border-slate-200 text-slate-900'
+          : 'bg-[#0a0f1d] border-white/5 text-slate-100'
+      }`}>
         {/* Header */}
         <Header
           fastingState={fastingState}
+          currentTheme={currentTheme}
           onOpenSettings={() => setIsSettingsModalOpen(true)}
           onOpenStages={() => setIsStageModalOpen(true)}
+          onOpenThemeSelector={() => setIsThemeModalOpen(true)}
           todayWaterMl={todayWaterMl}
         />
 
@@ -92,6 +117,7 @@ export function App() {
                 targetHours={targetHours}
                 progressPercent={progressPercent}
                 currentStage={currentStage}
+                currentTheme={currentTheme}
                 onStartFasting={startFasting}
                 onStopFasting={stopFasting}
                 onOpenStageDetails={() => setIsStageModalOpen(true)}
@@ -103,6 +129,7 @@ export function App() {
                 <WaterTracker
                   todayWaterMl={todayWaterMl}
                   targetWaterMl={userProfile.dailyWaterTargetMl}
+                  currentTheme={currentTheme}
                   onAddWater={handleAddWater}
                 />
               </div>
@@ -112,25 +139,37 @@ export function App() {
                 <div className="px-4 pb-4">
                   <div
                     onClick={() => setCurrentTab('timeline')}
-                    className="glass-card rounded-2xl p-3.5 border border-white/10 flex items-center justify-between cursor-pointer hover:bg-white/5 transition-colors"
+                    className={`glass-card rounded-3xl p-3.5 border flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${
+                      isLight ? 'border-purple-100 shadow-xs' : 'border-white/10'
+                    }`}
                   >
                     <div className="flex items-center space-x-3">
                       <img
                         src={meals[0].imageUrl}
                         alt="Recent meal"
-                        className="w-12 h-12 rounded-xl object-cover border border-white/10"
+                        className="w-12 h-12 rounded-2xl object-cover border border-slate-200/60 shadow-xs"
                       />
                       <div>
-                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">최근 식사 기록</span>
-                        <h4 className="text-xs font-bold text-white truncate max-w-[170px]">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider block ${
+                          isLight ? 'text-slate-400' : 'text-slate-400'
+                        }`}>
+                          최근 식사 기록
+                        </span>
+                        <h4 className={`text-xs font-bold truncate max-w-[170px] ${
+                          isLight ? 'text-slate-800' : 'text-white'
+                        }`}>
                           {meals[0].aiAnalysis.foods[0]?.name || '식사 기록'}
                         </h4>
-                        <span className="text-[11px] text-orange-400 font-mono">
+                        <span className="text-[11px] text-orange-500 font-mono font-semibold">
                           {meals[0].aiAnalysis.total_nutrition.calories} kcal • 혈당 위험도 {meals[0].aiAnalysis.sugar_spike_risk}
                         </span>
                       </div>
                     </div>
-                    <span className="text-xs text-blue-400 font-semibold">피드 보기 &rarr;</span>
+                    <span className={`text-xs font-bold ${
+                      currentTheme === 'pastel' ? 'text-purple-600' : isLight ? 'text-blue-600' : 'text-blue-400'
+                    }`}>
+                      피드 보기 &rarr;
+                    </span>
                   </div>
                 </div>
               )}
@@ -141,6 +180,7 @@ export function App() {
             <div className="animate-fade-in">
               <MealTimeline
                 meals={meals}
+                currentTheme={currentTheme}
                 onDeleteMeal={handleDeleteMeal}
                 onOpenUploader={() => setIsUploaderModalOpen(true)}
               />
@@ -164,6 +204,7 @@ export function App() {
                 fastingState={fastingState}
                 elapsedHours={elapsedHours}
                 currentStage={currentStage}
+                currentTheme={currentTheme}
                 meals={meals}
                 todayWaterMl={todayWaterMl}
               />
@@ -174,6 +215,7 @@ export function App() {
         {/* Bottom Navigation with Floating Camera Action */}
         <BottomNavigation
           currentTab={currentTab}
+          currentTheme={currentTheme}
           onSelectTab={setCurrentTab}
           onOpenMealUploader={() => setIsUploaderModalOpen(true)}
         />
@@ -201,6 +243,13 @@ export function App() {
           elapsedHours={elapsedHours}
           onMealAdded={handleMealAdded}
           onStopFastingRequest={stopFasting}
+        />
+
+        <ThemeSelectorModal
+          isOpen={isThemeModalOpen}
+          onClose={() => setIsThemeModalOpen(false)}
+          currentTheme={currentTheme}
+          onSelectTheme={handleSelectTheme}
         />
 
         <SettingsModal

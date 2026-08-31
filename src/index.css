@@ -2,49 +2,86 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
 :root {
-  color-scheme: dark;
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* Base Theme Configurations */
 body {
   margin: 0;
   padding: 0;
-  background-color: #080c17;
-  color: #f1f5f9;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;
-  -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Custom Glassmorphism styles */
-.glass-card {
+/* 🌸 Pastel Theme (Default - Bright & Warm Milk Pastel) */
+.theme-pastel {
+  background-color: #fcf9fe;
+  color: #1e293b;
+}
+.theme-pastel .glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 212, 248, 0.7);
+  box-shadow: 0 10px 25px -8px rgba(168, 85, 247, 0.08);
+}
+.theme-pastel .sub-card {
+  background: #fdfafd;
+  border: 1px solid #f3e8ff;
+}
+
+/* 🪵 Cozy Wood Theme */
+.theme-wood {
+  background-color: #faf6f0;
+  color: #443627;
+}
+.theme-wood .glass-card {
+  background: rgba(255, 253, 250, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #ecdcd0;
+  box-shadow: 0 10px 25px -8px rgba(138, 98, 64, 0.08);
+}
+.theme-wood .sub-card {
+  background: #f5ede4;
+  border: 1px solid #e5d5c7;
+}
+
+/* 🖤 Modern Clean Mono Theme */
+.theme-mono {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+.theme-mono .glass-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.05);
+}
+.theme-mono .sub-card {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+/* 🌙 Midnight Dark Theme */
+.theme-dark {
+  background-color: #080c17;
+  color: #f1f5f9;
+}
+.theme-dark .glass-card {
   background: rgba(19, 28, 49, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
-
-.glass-pill {
+.theme-dark .sub-card {
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.glow-blue {
-  box-shadow: 0 0 25px rgba(59, 130, 246, 0.35);
-}
-
-.glow-green {
-  box-shadow: 0 0 25px rgba(16, 185, 129, 0.35);
-}
-
-.glow-pink {
-  box-shadow: 0 0 25px rgba(236, 72, 153, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Custom Scrollbar */
@@ -56,19 +93,8 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(150, 150, 150, 0.25);
   border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Safe area for mobile notch / navigation bars */
-.safe-top {
-  padding-top: env(safe-area-inset-top, 0px);
-}
-.safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 16px);
 }
 
 @keyframes fadeIn {
