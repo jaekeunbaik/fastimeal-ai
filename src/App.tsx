@@ -220,8 +220,10 @@ export function App() {
               <DailyStatsSummary
                 meals={meals}
                 sessions={sessions}
+                bodyLogs={bodyLogs}
+                waterMl={todayWaterMl}
                 userProfile={userProfile}
-                todayWaterMl={todayWaterMl}
+                currentTheme={currentTheme}
               />
             </div>
           )}
