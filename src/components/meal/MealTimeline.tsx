@@ -90,29 +90,44 @@ export const MealTimeline: React.FC<MealTimelineProps> = ({
         </div>
       )}
 
-      {/* Meals Feed */}
+      {/* Section Title */}
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h2 className="text-base font-bold flex items-center space-x-1.5">
+            <Utensils className="w-4 h-4 text-purple-600 dark:text-emerald-400" />
+            <span>사진 식단 다이어리</span>
+          </h2>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            시간 순 정렬 및 식단 영양 기록 피드
+          </p>
+        </div>
+
+        <button
+          onClick={onOpenUploader}
+          className="px-3 py-1.5 rounded-full text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center space-x-1 shadow-sm transition-all active:scale-95"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span>기록 추가</span>
+        </button>
+      </div>
+
+      {/* Meals Feed or Empty State */}
       {meals.length === 0 ? (
-        <div className={`text-center py-12 px-4 glass-card rounded-3xl border border-dashed my-4 ${
-          isLight ? 'border-purple-200' : 'border-slate-700'
-        }`}>
-          <div className={`w-14 h-14 mx-auto rounded-2xl flex items-center justify-center mb-3 ${
-            isLight ? 'bg-purple-100 text-purple-600' : 'bg-blue-500/10 text-blue-400'
-          }`}>
-            <Sparkles className="w-7 h-7" />
+        <div className="glass-card rounded-3xl p-8 text-center flex flex-col items-center justify-center border">
+          <div className="w-14 h-14 rounded-2xl bg-purple-100 dark:bg-white/5 text-purple-600 dark:text-purple-300 flex items-center justify-center mb-3 shadow-xs">
+            <Utensils className="w-7 h-7" />
           </div>
-          <h3 className={`text-base font-bold mb-1 ${isLight ? 'text-slate-800' : 'text-white'}`}>
+          <h3 className="text-sm font-bold mb-1 text-slate-800 dark:text-white">
             아직 기록된 식단이 없습니다
           </h3>
-          <p className={`text-xs max-w-xs mx-auto mb-4 leading-relaxed ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-            식사 또는 음료 사진을 찍어 올리시면 AI가 자동으로 칼로리와 탄단지를 분석해드립니다.
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mb-4 leading-relaxed">
+            오늘 먹은 식사나 음료 사진을 찍어 나만의 건강한 식단 다이어리를 기록해보세요.
           </p>
           <button
             onClick={onOpenUploader}
-            className={`px-5 py-2.5 rounded-2xl text-white text-xs font-bold shadow-lg transition-transform active:scale-95 ${
-              currentTheme === 'pastel' ? 'bg-purple-600' : 'bg-blue-600'
-            }`}
+            className="px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center space-x-1.5 shadow-md shadow-purple-500/20 active:scale-95 transition-all"
           >
-            📸 첫 식단 사진 올리기
+            <span>📸 첫 식단 사진 올리기</span>
           </button>
         </div>
       ) : (
