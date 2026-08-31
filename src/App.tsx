@@ -40,7 +40,7 @@ export function App() {
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
   const [isStartModalOpen, setIsStartModalOpen] = useState(false);
 
-  // Fasting timer hook (동적으로 선택된 targetFastingHours 연동)
+  // Fasting timer hook (24시간 자동 무한 루틴 엔진)
   const {
     isFasting,
     fastingState,
@@ -53,7 +53,10 @@ export function App() {
     currentStage,
     startFasting,
     stopFasting,
-  } = useFastingTimer(userProfile.targetFastingHours || 16);
+  } = useFastingTimer({
+    firstMealTime: userProfile.firstMealTime || '11:30',
+    defaultTargetHours: userProfile.targetFastingHours || 16,
+  });
 
   // Water handler
   const handleAddWater = (amountMl: number) => {

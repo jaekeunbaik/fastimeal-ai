@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Square, Sparkles, Flame, Clock, Info, ChevronRight, CheckCircle2, Utensils } from 'lucide-react';
+import { Play, Square, Sparkles, Flame, Clock, Info, ChevronRight, CheckCircle2, Utensils, RefreshCw } from 'lucide-react';
 import { MetabolicStage, AppTheme } from '../../types';
 import { METABOLIC_STAGES } from '../../constants/metabolism';
 import { THEMES } from '../../constants/themes';
@@ -16,7 +16,7 @@ interface MetabolicRingTimerProps {
   currentStage: MetabolicStage;
   currentTheme: AppTheme;
   firstMealTime?: string;
-  onStartFasting: (targetHours?: number) => void;
+  onStartFasting: () => void;
   onStopFasting: () => void;
   onOpenStageDetails: () => void;
   onOpenPlanSelector: () => void;
@@ -43,7 +43,6 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
   const theme = THEMES[currentTheme] || THEMES.pastel;
   const isLight = currentTheme !== 'dark';
 
-  // SVG 원형 게이지 계산
   const size = 280;
   const strokeWidth = 14;
   const center = size / 2;
@@ -69,7 +68,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
           }`}
         >
           <Utensils className="w-3.5 h-3.5 text-purple-600" />
-          <span className="text-xs font-bold">점심 {schedule.firstMealTime} 기준:</span>
+          <span className="text-xs font-bold">점심 {schedule.firstMealTime} 자동 루틴:</span>
           <span className="text-xs font-extrabold" style={{ color: theme.accentColor }}>{targetHours}:{24 - targetHours}</span>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         </button>
@@ -85,18 +84,21 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
         </button>
       </div>
 
-      {/* Routine Schedule Bar */}
+      {/* Routine Schedule Bar (Active Status Indicator) */}
       <div
         onClick={onOpenPlanSelector}
         className={`w-full px-3.5 py-2 rounded-2xl border mb-2 flex items-center justify-between text-[11px] cursor-pointer transition-all ${
           isLight ? 'bg-purple-50/60 border-purple-100 text-slate-600 hover:bg-purple-50' : 'bg-white/5 border-white/5 text-slate-300'
         }`}
       >
-        <span className="flex items-center space-x-1">
-          <span>🍱 식사창 <strong>{schedule.firstMealTime} ~ {schedule.lastMealTime}</strong></span>
+        <span className="flex items-center space-x-1.5">
+          <span className={`w-2 h-2 rounded-full animate-ping ${isFasting ? 'bg-purple-500' : 'bg-emerald-500'}`} />
+          <span>{isFasting ? '🌙 자동 단식 구간' : '🍱 자동 식사창 구간'}</span>
         </span>
-        <span className="flex items-center space-x-1 text-purple-600 dark:text-purple-400 font-semibold">
-          <span>🌙 단식 <strong>{schedule.lastMealTime} ~ {schedule.firstMealTime}</strong></span>
+        <span className="flex items-center space-x-1 font-mono font-bold">
+          <span className="text-emerald-600">{schedule.firstMealTime}</span>
+          <span className="text-slate-400">~</span>
+          <span className="text-purple-600">{schedule.lastMealTime}</span>
         </span>
       </div>
 
@@ -105,7 +107,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
         {/* Ambient Glow Background */}
         <div
           className="absolute inset-0 rounded-full blur-3xl opacity-20 transition-all duration-700 pointer-events-none"
-          style={{ backgroundColor: stageColor }}
+          style={{ backgroundColor: isFasting ? stageColor : '#10b981' }}
         />
 
         <svg width={size} height={size} className="transform -rotate-90">
@@ -140,7 +142,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
             strokeWidth={strokeWidth}
             fill="transparent"
             strokeDasharray={circumference}
-            strokeDashoffset={isFasting ? strokeDashoffset : 0}
+            strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
             className="transition-all duration-1000 ease-out"
             style={{
@@ -151,7 +153,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
 
         {/* Center Content */}
         <div
-          onClick={() => isFasting && setShowRemaining(!showRemaining)}
+          onClick={() => setShowRemaining(!showRemaining)}
           className="absolute flex flex-col items-center justify-center text-center cursor-pointer p-4 select-none"
         >
           {isFasting ? (
@@ -180,7 +182,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
                 isLight ? 'text-slate-500' : 'text-slate-400'
               }`}>
                 <Clock className="w-3 h-3 opacity-60" />
-                <span>{showRemaining ? '목표까지 남은 시간' : '현재 단식 경과 시간'}</span>
+                <span>{showRemaining ? `점심(${schedule.firstMealTime})까지 남은 시간` : '공복 유지 시간'}</span>
               </div>
 
               {/* Progress Percentage Badge */}
@@ -195,18 +197,21 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
             </>
           ) : (
             <>
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-2 shadow-md ${
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center mb-1.5 shadow-md ${
                 currentTheme === 'pastel'
-                  ? 'bg-pink-100 text-pink-500 border border-pink-200'
-                  : isLight
                   ? 'bg-emerald-100 text-emerald-600 border border-emerald-200'
-                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : isLight
+                  ? 'bg-emerald-100 text-emerald-600'
+                  : 'bg-emerald-500/20 text-emerald-400'
               }`}>
-                <Sparkles className="w-6 h-6" />
+                <Sparkles className="w-5 h-5" />
               </div>
-              <span className={`text-xl font-bold mb-1 ${isLight ? 'text-slate-800' : 'text-white'}`}>식사 가능 시간</span>
-              <p className={`text-xs max-w-[170px] leading-relaxed ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-                점심({schedule.firstMealTime}) 맛있게 드시고 저녁({schedule.lastMealTime}) 후 단식을 시작해보세요
+              <span className={`text-lg font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>식사 윈도우 진행 중</span>
+              <span className={`text-2xl font-extrabold font-mono my-0.5 text-emerald-600 dark:text-emerald-400`}>
+                {formattedRemaining}
+              </span>
+              <p className={`text-[11px] leading-relaxed ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                저녁({schedule.lastMealTime})까지 식사 완료 후 단식 전환
               </p>
             </>
           )}
@@ -217,11 +222,11 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
       <div className="w-full glass-card rounded-3xl p-4 mb-4">
         <div className="flex items-center justify-between text-xs mb-2">
           <span className={`font-bold flex items-center ${isLight ? 'text-slate-700' : 'text-slate-200'}`}>
-            <span className="w-2.5 h-2.5 rounded-full mr-1.5" style={{ backgroundColor: stageColor }} />
-            {currentStage.name} ({currentStage.startHour}~{currentStage.endHour > 24 ? '16+' : currentStage.endHour}h)
+            <span className="w-2.5 h-2.5 rounded-full mr-1.5" style={{ backgroundColor: isFasting ? stageColor : '#10b981' }} />
+            {isFasting ? `${currentStage.name} (${currentStage.startHour}~${currentStage.endHour > 24 ? '16+' : currentStage.endHour}h)` : '식사 및 영양 흡수 시간 (8시간)'}
           </span>
           <span className={`text-[11px] font-mono ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-            {elapsedHours.toFixed(1)}h 경과
+            {isFasting ? `${elapsedHours.toFixed(1)}h 공복 중` : `${elapsedHours.toFixed(1)}h 식사창 경과`}
           </span>
         </div>
 
@@ -253,41 +258,23 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
         </div>
 
         <p className={`text-xs leading-snug ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
-          💡 {currentStage.shortDesc}
+          💡 {isFasting ? currentStage.shortDesc : '점심과 저녁을 건강하게 섭취하여 다음 16시간 공복을 준비하세요.'}
         </p>
       </div>
 
       {/* Main Action Buttons & Quick 250ml Water */}
       <div className="w-full flex items-center space-x-2.5">
-        {isFasting ? (
-          <button
-            onClick={onStopFasting}
-            className={`flex-1 py-3.5 px-4 rounded-2xl font-bold text-xs flex items-center justify-center space-x-2 transition-all active:scale-[0.98] ${
-              isLight
-                ? 'bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 shadow-xs'
-                : 'bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-400'
-            }`}
-          >
-            <Square className="w-4 h-4 fill-current" />
-            <span>단식 종료 (식사 시작)</span>
-          </button>
-        ) : (
-          <button
-            onClick={() => onStartFasting(targetHours)}
-            className={`flex-1 py-3.5 px-4 rounded-2xl text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-lg transition-all active:scale-[0.98] ${
-              currentTheme === 'pastel'
-                ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-400 hover:opacity-95 shadow-purple-500/25'
-                : currentTheme === 'wood'
-                ? 'bg-gradient-to-r from-[#8a6240] to-[#b3855e] hover:opacity-95 shadow-amber-900/20'
-                : currentTheme === 'mono'
-                ? 'bg-slate-900 hover:bg-slate-800 shadow-slate-900/25'
-                : 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-blue-500/25'
-            }`}
-          >
-            <Play className="w-4 h-4 fill-current" />
-            <span>지금 단식 시작하기 ({targetHours}시간)</span>
-          </button>
-        )}
+        <button
+          onClick={onOpenPlanSelector}
+          className={`flex-1 py-3.5 px-4 rounded-2xl font-bold text-xs flex items-center justify-center space-x-2 transition-all active:scale-[0.98] ${
+            isLight
+              ? 'bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 shadow-xs'
+              : 'bg-white/10 hover:bg-white/15 border border-white/10 text-white'
+          }`}
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          <span>매일 24시간 자동 루틴 동작 중 (루틴 변경)</span>
+        </button>
 
         {/* Quick Water Button */}
         <button
