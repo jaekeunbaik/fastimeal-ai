@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from './components/layout/Header';
 import { BottomNavigation, NavTab } from './components/layout/BottomNavigation';
 import { MetabolicRingTimer } from './components/timer/MetabolicRingTimer';
