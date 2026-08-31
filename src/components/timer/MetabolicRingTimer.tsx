@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Play, Square, Sparkles, Flame, Clock, Info, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Play, Square, Sparkles, Flame, Clock, Info, ChevronRight, CheckCircle2, Utensils } from 'lucide-react';
 import { MetabolicStage, AppTheme } from '../../types';
 import { METABOLIC_STAGES } from '../../constants/metabolism';
 import { THEMES } from '../../constants/themes';
+import { calculateFastingSchedule } from '../../utils/fastingSchedule';
 
 interface MetabolicRingTimerProps {
   isFasting: boolean;
@@ -14,6 +15,7 @@ interface MetabolicRingTimerProps {
   progressPercent: number;
   currentStage: MetabolicStage;
   currentTheme: AppTheme;
+  firstMealTime?: string;
   onStartFasting: (targetHours?: number) => void;
   onStopFasting: () => void;
   onOpenStageDetails: () => void;
@@ -30,6 +32,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
   progressPercent,
   currentStage,
   currentTheme,
+  firstMealTime = '11:30',
   onStartFasting,
   onStopFasting,
   onOpenStageDetails,
@@ -48,14 +51,15 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (Math.min(100, progressPercent) / 100) * circumference;
 
-  // 테마에 맞는 대사 단계 색상 매핑
   const stageKeys = ['digest', 'insulin', 'glycogen', 'ketosis', 'autophagy'] as const;
   const stageColor = theme.stageColors[stageKeys[currentStage.id - 1]] || currentStage.color;
 
+  const schedule = calculateFastingSchedule(firstMealTime, targetHours);
+
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto px-4 py-2">
-      {/* Plan Header & Selector */}
-      <div className="w-full flex items-center justify-between mb-3">
+      {/* Plan Header & Lunch Routine Badge */}
+      <div className="w-full flex items-center justify-between mb-2">
         <button
           onClick={onOpenPlanSelector}
           className={`flex items-center space-x-2 px-3 py-1.5 rounded-2xl border transition-all ${
@@ -64,8 +68,9 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
               : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
           }`}
         >
-          <span className="text-xs font-semibold">간헐적 단식 플랜:</span>
-          <span className="text-xs font-bold" style={{ color: theme.accentColor }}>{targetHours}:{24 - targetHours}</span>
+          <Utensils className="w-3.5 h-3.5 text-purple-600" />
+          <span className="text-xs font-bold">점심 {schedule.firstMealTime} 기준:</span>
+          <span className="text-xs font-extrabold" style={{ color: theme.accentColor }}>{targetHours}:{24 - targetHours}</span>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         </button>
 
@@ -80,8 +85,23 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
         </button>
       </div>
 
+      {/* Routine Schedule Bar */}
+      <div
+        onClick={onOpenPlanSelector}
+        className={`w-full px-3.5 py-2 rounded-2xl border mb-2 flex items-center justify-between text-[11px] cursor-pointer transition-all ${
+          isLight ? 'bg-purple-50/60 border-purple-100 text-slate-600 hover:bg-purple-50' : 'bg-white/5 border-white/5 text-slate-300'
+        }`}
+      >
+        <span className="flex items-center space-x-1">
+          <span>🍱 식사창 <strong>{schedule.firstMealTime} ~ {schedule.lastMealTime}</strong></span>
+        </span>
+        <span className="flex items-center space-x-1 text-purple-600 dark:text-purple-400 font-semibold">
+          <span>🌙 단식 <strong>{schedule.lastMealTime} ~ {schedule.firstMealTime}</strong></span>
+        </span>
+      </div>
+
       {/* Interactive Metabolic Circular Gauge */}
-      <div className="relative flex items-center justify-center my-3">
+      <div className="relative flex items-center justify-center my-2">
         {/* Ambient Glow Background */}
         <div
           className="absolute inset-0 rounded-full blur-3xl opacity-20 transition-all duration-700 pointer-events-none"
@@ -100,7 +120,7 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
             strokeLinecap="round"
           />
 
-          {/* Metabolic Stage Sub-arcs (Background Segment Guides) */}
+          {/* Segment Guides */}
           <circle
             cx={center}
             cy={center}
@@ -186,14 +206,14 @@ export const MetabolicRingTimer: React.FC<MetabolicRingTimerProps> = ({
               </div>
               <span className={`text-xl font-bold mb-1 ${isLight ? 'text-slate-800' : 'text-white'}`}>식사 가능 시간</span>
               <p className={`text-xs max-w-[170px] leading-relaxed ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-                영양 균형 잡힌 식사 후 단식을 시작해보세요
+                점심({schedule.firstMealTime}) 맛있게 드시고 저녁({schedule.lastMealTime}) 후 단식을 시작해보세요
               </p>
             </>
           )}
         </div>
       </div>
 
-      {/* Metabolic Stage Progress Bar Indicator (5 Stages Mini) */}
+      {/* Metabolic Stage Progress Bar Indicator */}
       <div className="w-full glass-card rounded-3xl p-4 mb-4">
         <div className="flex items-center justify-between text-xs mb-2">
           <span className={`font-bold flex items-center ${isLight ? 'text-slate-700' : 'text-slate-200'}`}>

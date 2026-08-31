@@ -12,6 +12,7 @@ export const DEFAULT_USER: UserProfile = {
   heightCm: undefined,
   startWeightKg: undefined,
   targetWeightKg: undefined,
+  firstMealTime: '11:30', // 기본값: 점심 11:30 기준
   fastingPlan: '16:8',
   targetFastingHours: 16,
   targetStartHour: 20, // 20:00 단식 시작

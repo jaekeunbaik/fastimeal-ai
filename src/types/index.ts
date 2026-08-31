@@ -28,6 +28,7 @@ export interface UserProfile {
   heightCm?: number; // e.g. 168
   startWeightKg?: number; // e.g. 65.0
   targetWeightKg?: number; // e.g. 55.0
+  firstMealTime: string; // e.g. "11:30" (첫 끼 / 점심 식사 시간)
   fastingPlan: FastingPlan;
   targetFastingHours: number;
   targetStartHour: number; // e.g. 20 (20:00)

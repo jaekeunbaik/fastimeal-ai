@@ -59,9 +59,14 @@ export function App() {
     setTodayWaterMl(StorageService.getTodayWaterTotal());
   };
 
-  // Plan select handler
-  const handleSelectPlan = (plan: FastingPlan, hours: number) => {
-    const updated = { ...userProfile, fastingPlan: plan, targetFastingHours: hours };
+  // Plan select handler (including firstMealTime)
+  const handleSelectPlan = (plan: FastingPlan, hours: number, firstMealTime?: string) => {
+    const updated = {
+      ...userProfile,
+      fastingPlan: plan,
+      targetFastingHours: hours,
+      firstMealTime: firstMealTime || userProfile.firstMealTime || '11:30'
+    };
     setUserProfile(updated);
     StorageService.saveUserProfile(updated);
   };
@@ -125,6 +130,7 @@ export function App() {
                 progressPercent={progressPercent}
                 currentStage={currentStage}
                 currentTheme={currentTheme}
+                firstMealTime={userProfile.firstMealTime || '11:30'}
                 onStartFasting={startFasting}
                 onStopFasting={stopFasting}
                 onOpenStageDetails={() => setIsStageModalOpen(true)}
@@ -237,6 +243,8 @@ export function App() {
           onClose={() => setIsPlanModalOpen(false)}
           currentPlan={userProfile.fastingPlan}
           currentTargetHours={userProfile.targetFastingHours}
+          currentFirstMealTime={userProfile.firstMealTime || '11:30'}
+          currentTheme={currentTheme}
           onSelectPlan={handleSelectPlan}
         />
 

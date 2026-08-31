@@ -82,19 +82,35 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <span>내 다이어트 목표</span>
             </div>
 
-            <div>
-              <label className="text-[11px] text-slate-500 font-semibold block mb-1">닉네임</label>
-              <input
-                type="text"
-                placeholder="예: 닉네임을 입력하세요 (미입력 시 단식러)"
-                value={profile.nickname}
-                onChange={(e) => setProfile({ ...profile, nickname: e.target.value })}
-                className={`w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none ${
-                  isLight
-                    ? 'bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:border-purple-500 shadow-xs'
-                    : 'bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:border-blue-500'
-                }`}
-              />
+            <div className="grid grid-cols-2 gap-2.5">
+              <div>
+                <label className="text-[11px] text-slate-500 font-semibold block mb-1">닉네임</label>
+                <input
+                  type="text"
+                  placeholder="예: 닉네임"
+                  value={profile.nickname}
+                  onChange={(e) => setProfile({ ...profile, nickname: e.target.value })}
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none ${
+                    isLight
+                      ? 'bg-white border border-slate-200 text-slate-800 focus:border-purple-500 shadow-xs'
+                      : 'bg-slate-800/80 border border-slate-700 text-white focus:border-blue-500'
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] text-slate-500 font-semibold block mb-1">첫 끼(점심) 시간</label>
+                <input
+                  type="time"
+                  value={profile.firstMealTime || '11:30'}
+                  onChange={(e) => setProfile({ ...profile, firstMealTime: e.target.value })}
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold font-mono transition-all focus:outline-none ${
+                    isLight
+                      ? 'bg-white border border-slate-200 text-slate-800 focus:border-purple-500 shadow-xs'
+                      : 'bg-slate-800/80 border border-slate-700 text-white focus:border-blue-500'
+                  }`}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
