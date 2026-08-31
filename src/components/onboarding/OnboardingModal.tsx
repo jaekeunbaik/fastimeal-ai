@@ -151,7 +151,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 반가워요! <br />어떻게 불러드릴까요?
               </h2>
               <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-                FastiMeal AI와 함께 건강하고 지속 가능한 간헐적 단식 & 식단 관리를 시작해보세요.
+                FastiMeal과 함께 건강하고 지속 가능한 간헐적 단식 & 식단 관리를 시작해보세요.
               </p>
             </div>
 

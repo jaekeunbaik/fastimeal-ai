@@ -239,7 +239,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center space-x-2 text-[11px] text-slate-400">
               <Smartphone className="w-3.5 h-3.5" />
-              <span>FastiMeal AI v1.0.0</span>
+              <span>FastiMeal v1.0.0</span>
             </div>
 
             <button

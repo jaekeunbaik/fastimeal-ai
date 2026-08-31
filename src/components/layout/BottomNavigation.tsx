@@ -90,10 +90,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
                 ? 'bg-slate-900'
                 : 'bg-gradient-to-tr from-blue-600 to-indigo-600'
             }`}>
-              <Camera className="w-5 h-5 group-hover:animate-bounce" />
-              <span className="text-[8px] font-black uppercase tracking-wider flex items-center">
-                AI <Sparkles className="w-2 h-2 ml-0.5" />
-              </span>
+              <Camera className="w-6 h-6 group-hover:scale-110 transition-transform" />
             </div>
           </button>
         </div>

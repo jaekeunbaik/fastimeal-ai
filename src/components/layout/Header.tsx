@@ -47,17 +47,6 @@ export const Header: React.FC<HeaderProps> = ({
             <span className={`font-extrabold text-base tracking-tight ${isLight ? 'text-slate-800' : 'text-white'}`}>
               FastiMeal
             </span>
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-              currentTheme === 'pastel'
-                ? 'bg-purple-100 text-purple-700 border border-purple-200'
-                : currentTheme === 'wood'
-                ? 'bg-[#ebdcd0] text-[#6e5d4f] border border-[#ddcdbf]'
-                : currentTheme === 'mono'
-                ? 'bg-slate-100 text-slate-800 border border-slate-300'
-                : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-            }`}>
-              AI
-            </span>
           </div>
           <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
             대사 5단계 & 간헐적 단식 다이어리
