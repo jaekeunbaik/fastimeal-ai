@@ -8,13 +8,13 @@ import { WaterTracker } from './components/water/WaterTracker';
 import { MealTimeline } from './components/meal/MealTimeline';
 import { MealUploaderModal } from './components/meal/MealUploaderModal';
 import { DailyStatsSummary } from './components/stats/DailyStatsSummary';
-import { AICoachView } from './components/coach/AICoachView';
+import { BodyCalendarView } from './components/calendar/BodyCalendarView';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { ThemeSelectorModal } from './components/theme/ThemeSelectorModal';
 
 import { useFastingTimer } from './hooks/useFastingTimer';
 import { StorageService } from './services/storageService';
-import { FastingPlan, MealLog, UserProfile, FastingSession, AppTheme } from './types';
+import { FastingPlan, MealLog, UserProfile, FastingSession, AppTheme, BodyLog } from './types';
 import { THEMES } from './constants/themes';
 
 export function App() {
@@ -22,6 +22,7 @@ export function App() {
   const [userProfile, setUserProfile] = useState<UserProfile>(() => StorageService.getUserProfile());
   const [meals, setMeals] = useState<MealLog[]>(() => StorageService.getMeals());
   const [sessions, setSessions] = useState<FastingSession[]>(() => StorageService.getSessions());
+  const [bodyLogs, setBodyLogs] = useState<BodyLog[]>(() => StorageService.getBodyLogs());
   const [todayWaterMl, setTodayWaterMl] = useState<number>(() => StorageService.getTodayWaterTotal());
 
   // Current active theme (Default: pastel)
@@ -80,6 +81,11 @@ export function App() {
   const handleDeleteMeal = (logId: string) => {
     StorageService.deleteMeal(logId);
     setMeals(StorageService.getMeals());
+  };
+
+  // Refresh body logs
+  const handleRefreshBodyLogs = () => {
+    setBodyLogs(StorageService.getBodyLogs());
   };
 
   return (
@@ -150,9 +156,7 @@ export function App() {
                         className="w-12 h-12 rounded-2xl object-cover border border-slate-200/60 shadow-xs"
                       />
                       <div>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider block ${
-                          isLight ? 'text-slate-400' : 'text-slate-400'
-                        }`}>
+                        <span className="text-[10px] font-bold uppercase tracking-wider block text-slate-400">
                           최근 식사 기록
                         </span>
                         <h4 className={`text-xs font-bold truncate max-w-[170px] ${
@@ -187,25 +191,24 @@ export function App() {
             </div>
           )}
 
+          {currentTab === 'calendar' && (
+            <div className="animate-fade-in">
+              <BodyCalendarView
+                bodyLogs={bodyLogs}
+                sessions={sessions}
+                meals={meals}
+                currentTheme={currentTheme}
+                onRefreshLogs={handleRefreshBodyLogs}
+              />
+            </div>
+          )}
+
           {currentTab === 'stats' && (
             <div className="animate-fade-in">
               <DailyStatsSummary
                 meals={meals}
                 sessions={sessions}
                 userProfile={userProfile}
-                todayWaterMl={todayWaterMl}
-              />
-            </div>
-          )}
-
-          {currentTab === 'profile' && (
-            <div className="animate-fade-in">
-              <AICoachView
-                fastingState={fastingState}
-                elapsedHours={elapsedHours}
-                currentStage={currentStage}
-                currentTheme={currentTheme}
-                meals={meals}
                 todayWaterMl={todayWaterMl}
               />
             </div>

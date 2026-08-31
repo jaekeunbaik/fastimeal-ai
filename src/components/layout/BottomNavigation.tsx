@@ -1,9 +1,9 @@
 import React from 'react';
-import { Timer, Camera, BarChart3, Clock, Sparkles } from 'lucide-react';
+import { Timer, Camera, BarChart3, Clock, Sparkles, Calendar as CalendarIcon } from 'lucide-react';
 import { AppTheme } from '../../types';
 import { THEMES } from '../../constants/themes';
 
-export type NavTab = 'timer' | 'timeline' | 'stats' | 'profile';
+export type NavTab = 'timer' | 'timeline' | 'calendar' | 'stats';
 
 interface BottomNavigationProps {
   currentTab: NavTab;
@@ -98,7 +98,26 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           </button>
         </div>
 
-        {/* Tab 3: Stats */}
+        {/* Tab 3: Calendar & Weight (NEW) */}
+        <button
+          onClick={() => onSelectTab('calendar')}
+          className={`flex flex-col items-center justify-center flex-1 py-2 rounded-2xl transition-all ${
+            currentTab === 'calendar'
+              ? currentTheme === 'pastel'
+                ? 'text-purple-600 bg-purple-50 font-bold shadow-xs'
+                : currentTheme === 'wood'
+                ? 'text-[#8a6240] bg-[#f5ede4] font-bold shadow-xs'
+                : currentTheme === 'mono'
+                ? 'text-slate-900 bg-slate-100 font-bold shadow-xs'
+                : 'text-blue-400 bg-blue-500/10 font-bold'
+              : isLight ? 'text-slate-400 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <CalendarIcon className="w-5 h-5 mb-0.5" />
+          <span className="text-[11px]">달력·체중</span>
+        </button>
+
+        {/* Tab 4: Stats */}
         <button
           onClick={() => onSelectTab('stats')}
           className={`flex flex-col items-center justify-center flex-1 py-2 rounded-2xl transition-all ${
@@ -115,25 +134,6 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
         >
           <BarChart3 className="w-5 h-5 mb-0.5" />
           <span className="text-[11px]">대사 분석</span>
-        </button>
-
-        {/* Tab 4: AI Coach */}
-        <button
-          onClick={() => onSelectTab('profile')}
-          className={`flex flex-col items-center justify-center flex-1 py-2 rounded-2xl transition-all ${
-            currentTab === 'profile'
-              ? currentTheme === 'pastel'
-                ? 'text-purple-600 bg-purple-50 font-bold shadow-xs'
-                : currentTheme === 'wood'
-                ? 'text-[#8a6240] bg-[#f5ede4] font-bold shadow-xs'
-                : currentTheme === 'mono'
-                ? 'text-slate-900 bg-slate-100 font-bold shadow-xs'
-                : 'text-blue-400 bg-blue-500/10 font-bold'
-              : isLight ? 'text-slate-400 hover:text-slate-700' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <Sparkles className="w-5 h-5 mb-0.5" />
-          <span className="text-[11px]">AI 코치</span>
         </button>
       </nav>
     </div>

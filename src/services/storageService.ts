@@ -1,9 +1,10 @@
-import { UserProfile, FastingSession, MealLog, WaterLog } from '../types';
+import { UserProfile, FastingSession, MealLog, WaterLog, BodyLog } from '../types';
 
 const USER_KEY = 'fastimeal_user_profile';
 const SESSIONS_KEY = 'fastimeal_sessions';
 const MEALS_KEY = 'fastimeal_meals';
 const WATER_KEY = 'fastimeal_water';
+const BODY_LOGS_KEY = 'fastimeal_body_logs';
 
 export const DEFAULT_USER: UserProfile = {
   userId: 'user_local',
@@ -175,5 +176,38 @@ export const StorageService = {
     return this.getWaterLogs()
       .filter(w => new Date(w.loggedAt).toDateString() === todayStr)
       .reduce((sum, w) => sum + w.amountMl, 0);
+  },
+
+  getBodyLogs(): BodyLog[] {
+    try {
+      const data = localStorage.getItem(BODY_LOGS_KEY);
+      if (data) return JSON.parse(data);
+    } catch (e) {
+      console.error('Failed to parse body logs', e);
+    }
+    return [];
+  },
+
+  saveBodyLog(log: BodyLog): void {
+    const logs = this.getBodyLogs();
+    const existingIdx = logs.findIndex(l => l.date === log.date);
+    if (existingIdx >= 0) {
+      logs[existingIdx] = log;
+    } else {
+      logs.unshift(log);
+    }
+    // 날짜 역순 정렬
+    logs.sort((a, b) => b.date.localeCompare(a.date));
+    localStorage.setItem(BODY_LOGS_KEY, JSON.stringify(logs));
+  },
+
+  deleteBodyLog(date: string): void {
+    const logs = this.getBodyLogs().filter(l => l.date !== date);
+    localStorage.setItem(BODY_LOGS_KEY, JSON.stringify(logs));
+  },
+
+  getBodyLogByDate(date: string): BodyLog | null {
+    const logs = this.getBodyLogs();
+    return logs.find(l => l.date === date) || null;
   }
 };

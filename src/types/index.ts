@@ -85,6 +85,17 @@ export interface MealLog {
   aiAnalysis: AIAnalysisResult;
 }
 
+export interface BodyLog {
+  logId: string;
+  date: string; // YYYY-MM-DD
+  weightKg: number; // e.g. 62.5
+  bodyFatPct?: number; // e.g. 21.4
+  muscleMassKg?: number; // e.g. 27.8
+  memo?: string;
+  photoUrl?: string;
+  loggedAt: string;
+}
+
 export interface WaterLog {
   logId: string;
   amountMl: number; // e.g. 250
