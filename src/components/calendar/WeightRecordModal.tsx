@@ -35,10 +35,13 @@ export const WeightRecordModal: React.FC<WeightRecordModalProps> = ({
         setMemo(log.memo || '');
       } else {
         setExistingLog(null);
-        // 기록이 없는 날짜는 빈칸으로 시작
-        setWeight('');
-        setBodyFat('');
-        setMuscle('');
+        // 가장 최근에 기록했던 몸무게나 온보딩 시작 몸무게를 자동으로 채워줌
+        const allLogs = StorageService.getBodyLogs();
+        const profile = StorageService.getUserProfile();
+        const defaultW = allLogs[0]?.weightKg || profile.startWeightKg || 60.0;
+        setWeight(defaultW.toString());
+        setBodyFat(allLogs[0]?.bodyFatPct ? allLogs[0].bodyFatPct.toString() : '');
+        setMuscle(allLogs[0]?.muscleMassKg ? allLogs[0].muscleMassKg.toString() : '');
         setMemo('');
       }
     }
