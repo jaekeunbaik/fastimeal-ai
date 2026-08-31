@@ -13,6 +13,7 @@ import { BodyCalendarView } from './components/calendar/BodyCalendarView';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { ThemeSelectorModal } from './components/theme/ThemeSelectorModal';
 import { OnboardingModal } from './components/onboarding/OnboardingModal';
+import { AdBanner } from './components/ads/AdBanner';
 
 import { useFastingTimer } from './hooks/useFastingTimer';
 import { StorageService } from './services/storageService';
@@ -228,6 +229,11 @@ export function App() {
             </div>
           )}
         </main>
+
+        {/* Smart Monetization Ad Banner */}
+        <div className="w-full pb-2">
+          <AdBanner currentTheme={currentTheme} position="bottom" />
+        </div>
 
         {/* Bottom Navigation with Floating Camera Action */}
         <BottomNavigation
