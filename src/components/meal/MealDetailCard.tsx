@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trash2, Flame } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { MealLog, AppTheme } from '../../types';
 
 interface MealDetailCardProps {
@@ -26,24 +26,16 @@ export const MealDetailCard: React.FC<MealDetailCardProps> = ({
 
   const dateObj = new Date(meal.consumedAt);
   const timeStr = `${dateObj.getHours().toString().padStart(2, '0')}:${dateObj.getMinutes().toString().padStart(2, '0')}`;
-
-  const food = meal.aiAnalysis?.foods?.[0];
-  const menuName = food?.name || '식사 기록';
-  const total = meal.aiAnalysis?.total_nutrition;
-  const calories = total?.calories || food?.calories || 0;
-  const carbs = total?.carbs_g || food?.carbs_g || 0;
-  const protein = total?.protein_g || food?.protein_g || 0;
-  const fat = total?.fat_g || food?.fat_g || 0;
-  const memo = meal.aiAnalysis?.ai_coach_comment;
+  const memo = meal.aiAnalysis?.ai_coach_comment || meal.aiAnalysis?.foods?.[0]?.name;
 
   return (
-    <div className={`glass-card rounded-3xl p-4 border transition-all ${
-      isLight ? 'bg-white/90 border-slate-200/80 shadow-sm' : 'border-white/10'
+    <div className={`glass-card rounded-3xl overflow-hidden border transition-all ${
+      isLight ? 'bg-white/95 border-slate-200/80 shadow-md' : 'border-white/10'
     }`}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
+      {/* Top Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-white/5">
         <div className="flex items-center space-x-2">
-          <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${badge.bg} ${badge.text}`}>
+          <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${badge.bg} ${badge.text}`}>
             {badge.label}
           </span>
           <span className={`text-xs font-mono font-bold ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -60,50 +52,21 @@ export const MealDetailCard: React.FC<MealDetailCardProps> = ({
         </button>
       </div>
 
-      {/* Main Content: Photo + Details */}
-      <div className="flex space-x-3.5">
-        {meal.imageUrl ? (
+      {/* Large Instagram-style Photo */}
+      {meal.imageUrl && (
+        <div className="w-full h-64 bg-slate-100 dark:bg-slate-800 overflow-hidden">
           <img
             src={meal.imageUrl}
-            alt={menuName}
-            className="w-20 h-20 rounded-2xl object-cover border border-slate-200 dark:border-white/10 shadow-xs shrink-0"
+            alt="Meal Photo"
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
-        ) : (
-          <div className="w-20 h-20 rounded-2xl bg-purple-50 dark:bg-white/5 border border-purple-100 dark:border-white/10 flex items-center justify-center text-2xl shrink-0">
-            🍽️
-          </div>
-        )}
-
-        <div className="flex-1 flex flex-col justify-between min-w-0">
-          <div>
-            <h4 className={`text-sm font-bold truncate ${isLight ? 'text-slate-800' : 'text-white'}`}>
-              {menuName}
-            </h4>
-            <div className="flex items-center space-x-1.5 mt-0.5">
-              <Flame className="w-3.5 h-3.5 text-orange-500 shrink-0" />
-              <span className={`text-xs font-extrabold font-mono ${isLight ? 'text-slate-800' : 'text-white'}`}>
-                {calories} kcal
-              </span>
-            </div>
-          </div>
-
-          {/* Macros */}
-          <div className="flex items-center space-x-2 text-[10px] font-mono mt-1 text-slate-500 dark:text-slate-400">
-            <span>탄 <strong>{carbs}g</strong></span>
-            <span>·</span>
-            <span>단 <strong>{protein}g</strong></span>
-            <span>·</span>
-            <span>지 <strong>{fat}g</strong></span>
-          </div>
         </div>
-      </div>
+      )}
 
-      {/* Memo Note if present */}
-      {memo && memo !== '영양 밸런스를 맞춘 식단 기록입니다.' && (
-        <div className={`mt-3 pt-2.5 border-t text-[11px] leading-snug ${
-          isLight ? 'border-slate-100 text-slate-600' : 'border-white/5 text-slate-300'
-        }`}>
-          <p className="line-clamp-2">📝 {memo}</p>
+      {/* Caption Memo */}
+      {memo && memo !== '식단 사진 기록' && (
+        <div className="px-4 py-3 text-xs leading-relaxed text-slate-700 dark:text-slate-200">
+          <p>{memo}</p>
         </div>
       )}
     </div>
