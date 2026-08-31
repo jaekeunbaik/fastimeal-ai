@@ -6,8 +6,8 @@ const MEALS_KEY = 'fastimeal_meals';
 const WATER_KEY = 'fastimeal_water';
 
 export const DEFAULT_USER: UserProfile = {
-  userId: 'user-default-1',
-  nickname: '에단',
+  userId: 'user_local',
+  nickname: '',
   fastingPlan: '16:8',
   targetFastingHours: 16,
   targetStartHour: 20, // 20:00 단식 시작
