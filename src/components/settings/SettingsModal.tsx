@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { X, Key, User, Droplets, Flame, Save, ShieldCheck, Sparkles, Smartphone, RotateCcw } from 'lucide-react';
-import { UserProfile, AppTheme } from '../../types';
+import { X, User, Droplets, Flame, Save, Sparkles, Smartphone, RotateCcw, Bell, ShieldCheck, ChevronDown, ChevronUp, Key } from 'lucide-react';
+import { UserProfile } from '../../types';
 import { StorageService } from '../../services/storageService';
 
 interface SettingsModalProps {
@@ -16,6 +16,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [profile, setProfile] = useState<UserProfile>(() => StorageService.getUserProfile());
   const [isSaved, setIsSaved] = useState(false);
+  const [showAdvancedAi, setShowAdvancedAi] = useState(false);
 
   if (!isOpen) return null;
 
@@ -33,7 +34,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   const handleResetData = () => {
-    if (confirm('모든 단식 세션, 식단 기록, 수분 기록을 초기화하시겠습니까?')) {
+    if (confirm('모든 단식 기록, 식단 사진, 물 마시기 기록을 깨끗하게 초기화할까요?')) {
       localStorage.clear();
       window.location.reload();
     }
@@ -57,8 +58,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold">설정 & 프로필</h2>
-              <p className="text-[11px] text-slate-400">목표 및 Vision AI 연동 설정</p>
+              <h2 className="text-base font-bold">환경 설정</h2>
+              <p className="text-[11px] text-slate-400">목표 설정 및 앱 옵션</p>
             </div>
           </div>
           <button
@@ -73,12 +74,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         <div className="space-y-4 flex-1">
           {/* User Profile & Goals */}
-          <div className={`p-4 rounded-2xl border space-y-3 ${
+          <div className={`p-4 rounded-2xl border space-y-3.5 ${
             isLight ? 'bg-purple-50/40 border-purple-100' : 'bg-white/5 border-white/5'
           }`}>
             <div className="flex items-center space-x-2 text-xs font-bold">
               <User className="w-4 h-4 text-purple-600 dark:text-emerald-400" />
-              <span>내 프로필 & 다이어트 목표</span>
+              <span>내 다이어트 목표</span>
             </div>
 
             <div>
@@ -99,11 +100,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="grid grid-cols-2 gap-2.5">
               <div>
                 <label className="text-[11px] text-slate-500 font-semibold block mb-1 flex items-center">
-                  <Droplets className="w-3.5 h-3.5 text-cyan-500 mr-1" /> 일일 목표 수분 (ml)
+                  <Droplets className="w-3.5 h-3.5 text-cyan-500 mr-1" /> 하루 물 목표 (ml)
                 </label>
                 <input
                   type="number"
                   step="100"
+                  placeholder="2000"
                   value={profile.dailyWaterTargetMl || ''}
                   onChange={(e) => setProfile({ ...profile, dailyWaterTargetMl: Number(e.target.value) })}
                   className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all focus:outline-none ${
@@ -116,11 +118,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
               <div>
                 <label className="text-[11px] text-slate-500 font-semibold block mb-1 flex items-center">
-                  <Flame className="w-3.5 h-3.5 text-orange-500 mr-1" /> 일일 목표 칼로리 (kcal)
+                  <Flame className="w-3.5 h-3.5 text-orange-500 mr-1" /> 하루 칼로리 (kcal)
                 </label>
                 <input
                   type="number"
                   step="50"
+                  placeholder="1800"
                   value={profile.dailyCalorieTarget || ''}
                   onChange={(e) => setProfile({ ...profile, dailyCalorieTarget: Number(e.target.value) })}
                   className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all focus:outline-none ${
@@ -133,66 +136,53 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
-          {/* AI Provider & API Key */}
-          <div className={`p-4 rounded-2xl border space-y-3 ${
-            isLight ? 'bg-slate-50 border-slate-200/80' : 'bg-white/5 border-white/5'
+          {/* AI Feature Info Card */}
+          <div className={`p-3.5 rounded-2xl border flex items-center justify-between ${
+            isLight ? 'bg-purple-50/60 border-purple-100' : 'bg-blue-500/10 border-blue-500/20'
           }`}>
-            <div className="flex items-center space-x-2 text-xs font-bold">
-              <Key className="w-4 h-4 text-purple-600 dark:text-blue-400" />
-              <span>Vision AI 식단 분석 엔진</span>
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold">스마트 Vision AI 코칭</h4>
+                <p className="text-[10px] text-slate-500">음식 사진 촬영 시 칼로리 & 혈당 스파이크 자동 분석</p>
+              </div>
             </div>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">
+              무료 탑재
+            </span>
+          </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setProfile({ ...profile, aiProvider: 'gemini' })}
-                className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
-                  profile.aiProvider === 'gemini'
-                    ? isLight
-                      ? 'bg-purple-100 border-purple-400 text-purple-700 shadow-xs'
-                      : 'bg-blue-600/30 border-blue-500 text-white'
-                    : isLight
-                    ? 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100'
-                    : 'bg-white/5 border-white/5 text-slate-400'
-                }`}
-              >
-                Google Gemini (추천)
-              </button>
-              <button
-                onClick={() => setProfile({ ...profile, aiProvider: 'openai' })}
-                className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
-                  profile.aiProvider === 'openai'
-                    ? isLight
-                      ? 'bg-purple-100 border-purple-400 text-purple-700 shadow-xs'
-                      : 'bg-blue-600/30 border-blue-500 text-white'
-                    : isLight
-                    ? 'bg-white border-slate-200 text-slate-500 hover:bg-slate-100'
-                    : 'bg-white/5 border-white/5 text-slate-400'
-                }`}
-              >
-                OpenAI GPT-4o
-              </button>
-            </div>
+          {/* Advanced Developer Settings (Accordion - Collapsed by default) */}
+          <div className="border-t pt-2">
+            <button
+              onClick={() => setShowAdvancedAi(!showAdvancedAi)}
+              className="w-full flex items-center justify-between text-[11px] text-slate-400 hover:text-slate-600 py-1"
+            >
+              <span className="flex items-center space-x-1">
+                <Key className="w-3 h-3" />
+                <span>개인 AI API 키 직접 연동 (고급 설정)</span>
+              </span>
+              {showAdvancedAi ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
 
-            <div>
-              <label className="text-[11px] text-slate-500 font-semibold block mb-1">
-                API Key (미입력 시 지능형 시뮬레이션 모드로 자동 작동)
-              </label>
-              <input
-                type="password"
-                placeholder={profile.aiProvider === 'gemini' ? 'AIzaSy...' : 'sk-...'}
-                value={profile.apiKey || ''}
-                onChange={(e) => setProfile({ ...profile, apiKey: e.target.value })}
-                className={`w-full px-3.5 py-2.5 rounded-xl text-xs transition-all focus:outline-none ${
-                  isLight
-                    ? 'bg-white border border-slate-200 text-slate-800 placeholder-slate-400 focus:border-purple-500 shadow-xs'
-                    : 'bg-slate-800/80 border border-slate-700 text-white placeholder-slate-500 focus:border-blue-500'
-                }`}
-              />
-              <p className="text-[10px] text-slate-400 mt-1 flex items-center">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 mr-1" />
-                API 키는 본인 스마트폰 로컬에만 안전하게 보관됩니다.
-              </p>
-            </div>
+            {showAdvancedAi && (
+              <div className={`mt-2 p-3 rounded-2xl border space-y-2 text-xs animate-fade-in ${
+                isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-900 border-slate-800'
+              }`}>
+                <p className="text-[10px] text-slate-500">
+                  직접 발급받은 Gemini 또는 OpenAI API 키가 있는 경우에만 입력하세요. 미입력 시 내장 AI가 자동 동작합니다.
+                </p>
+                <input
+                  type="password"
+                  placeholder="API Key 입력 (선택 사항)"
+                  value={profile.apiKey || ''}
+                  onChange={(e) => setProfile({ ...profile, apiKey: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl text-xs bg-white border border-slate-200 focus:outline-none focus:border-purple-500"
+                />
+              </div>
+            )}
           </div>
 
           {/* App Info & Reset */}

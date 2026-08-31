@@ -76,16 +76,8 @@ export const StorageService = {
     } catch (e) {
       console.error('Failed to parse sessions', e);
     }
-    // 기본 시작 세션 (예: 13시간 전 시작된 활성 단식 세션)
-    const initialSession: FastingSession = {
-      sessionId: 'session-demo-1',
-      userId: 'user-default-1',
-      startTime: new Date(Date.now() - 13.5 * 3600 * 1000).toISOString(),
-      endTime: null,
-      targetDurationHours: 16,
-      status: 'IN_PROGRESS',
-    };
-    return [initialSession];
+    // 출시용 클린 상태: 초기 세션 없음
+    return [];
   },
 
   saveSessions(sessions: FastingSession[]): void {
@@ -102,7 +94,7 @@ export const StorageService = {
 
     const newSession: FastingSession = {
       sessionId: `session_${Date.now()}`,
-      userId: 'user-default-1',
+      userId: 'user_local',
       startTime: new Date().toISOString(),
       endTime: null,
       targetDurationHours: targetHours,
@@ -140,7 +132,8 @@ export const StorageService = {
     } catch (e) {
       console.error('Failed to parse meals', e);
     }
-    return INITIAL_MEALS;
+    // 출시용 클린 상태: 초기 식단 없음
+    return [];
   },
 
   addMeal(meal: MealLog): void {
@@ -161,13 +154,8 @@ export const StorageService = {
     } catch (e) {
       console.error('Failed to parse water logs', e);
     }
-    // 오늘 기본 샘플 기록 (750ml)
-    const today = new Date().toISOString().split('T')[0];
-    return [
-      { logId: 'w-1', amountMl: 250, loggedAt: `${today}T09:00:00.000Z` },
-      { logId: 'w-2', amountMl: 250, loggedAt: `${today}T11:30:00.000Z` },
-      { logId: 'w-3', amountMl: 250, loggedAt: `${today}T14:15:00.000Z` },
-    ];
+    // 출시용 클린 상태: 0ml 시작
+    return [];
   },
 
   addWater(amountMl = 250): WaterLog {
