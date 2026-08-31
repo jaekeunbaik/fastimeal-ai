@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppTheme } from '../types';
+import { AppTheme } from '../../types';
 
 interface AdBannerProps {
   currentTheme?: AppTheme;
