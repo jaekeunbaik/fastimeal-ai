@@ -101,11 +101,11 @@ export function App() {
       {/* Mobile Shell Wrapper (Google Play / Mobile native frame) */}
       <div className={`w-full max-w-md min-h-screen flex flex-col shadow-2xl relative border-x transition-colors duration-300 pb-20 ${
         currentTheme === 'pastel'
-          ? 'bg-[#fcf9fe] border-purple-100 text-slate-800'
+          ? 'bg-[#fbf7fd] border-purple-100 text-slate-800'
           : currentTheme === 'wood'
-          ? 'bg-[#faf6f0] border-[#ecdcd0] text-[#443627]'
+          ? 'bg-[#f3ece2] border-[#dfcebc] text-[#3d2b1f]'
           : currentTheme === 'mono'
-          ? 'bg-[#f8fafc] border-slate-200 text-slate-900'
+          ? 'bg-[#f1f1f4] border-zinc-300 text-black'
           : 'bg-[#0a0f1d] border-white/5 text-slate-100'
       }`}>
         {/* Header */}

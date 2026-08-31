@@ -6,7 +6,6 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Base Theme Configurations */
 body {
   margin: 0;
   padding: 0;
@@ -18,56 +17,42 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 🌸 Pastel Theme (Default - Bright & Warm Milk Pastel) */
+/* 🌸 1. Pastel Theme (소프트 밀크 & 핑크 라벤더) */
 .theme-pastel {
-  background-color: #fcf9fe;
+  background-color: #fbf7fd;
   color: #1e293b;
 }
 .theme-pastel .glass-card {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 212, 248, 0.7);
+  border: 1px solid rgba(233, 213, 255, 0.8);
   box-shadow: 0 10px 25px -8px rgba(168, 85, 247, 0.08);
 }
-.theme-pastel .sub-card {
-  background: #fdfafd;
-  border: 1px solid #f3e8ff;
-}
 
-/* 🪵 Cozy Wood Theme */
+/* 🪵 2. Cozy Wood Theme (따스한 오트밀 라떼 & 딥 월넛 브라운) */
 .theme-wood {
-  background-color: #faf6f0;
-  color: #443627;
+  background-color: #f3ece2;
+  color: #3d2b1f;
 }
 .theme-wood .glass-card {
-  background: rgba(255, 253, 250, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid #ecdcd0;
-  box-shadow: 0 10px 25px -8px rgba(138, 98, 64, 0.08);
-}
-.theme-wood .sub-card {
-  background: #f5ede4;
-  border: 1px solid #e5d5c7;
+  background: #fbf6ef;
+  border: 1px solid #dfcebc;
+  box-shadow: 0 10px 25px -8px rgba(92, 64, 51, 0.12);
 }
 
-/* 🖤 Modern Clean Mono Theme */
+/* 🖤 3. Modern Mono Theme (극강의 퓨어 화이트 & 딥 블랙 하이테크) */
 .theme-mono {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: #f1f1f4;
+  color: #09090b;
 }
 .theme-mono .glass-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.05);
-}
-.theme-mono .sub-card {
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #d4d4d8;
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.07);
 }
 
-/* 🌙 Midnight Dark Theme */
+/* 🌙 4. Midnight Dark Theme (네온 글래스모피즘 나이트) */
 .theme-dark {
   background-color: #080c17;
   color: #f1f5f9;
@@ -78,10 +63,6 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-}
-.theme-dark .sub-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Custom Scrollbar */
