@@ -35,8 +35,6 @@ export interface UserProfile {
   targetEndHour: number;   // e.g. 12 (12:00 next day)
   dailyWaterTargetMl: number; // e.g. 2000
   dailyCalorieTarget: number;
-  apiKey?: string; // Gemini or OpenAI API Key
-  aiProvider: 'gemini' | 'openai';
   theme: AppTheme;
   isOnboarded: boolean;
 }

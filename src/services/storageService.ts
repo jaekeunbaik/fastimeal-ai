@@ -19,8 +19,6 @@ export const DEFAULT_USER: UserProfile = {
   targetEndHour: 12,   // 12:00 익일 식사창 오픈
   dailyWaterTargetMl: 2000,
   dailyCalorieTarget: 1800,
-  aiProvider: 'gemini',
-  apiKey: '',
   theme: 'pastel',
   isOnboarded: false,
 };

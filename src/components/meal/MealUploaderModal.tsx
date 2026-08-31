@@ -1,374 +1,277 @@
 import React, { useState, useRef } from 'react';
-import { X, Camera, Upload, Sparkles, AlertTriangle, CheckCircle2, Flame, Loader2, ArrowRight } from 'lucide-react';
-import { FastingState, MealLog, AIAnalysisResult } from '../../types';
-import { analyzeFoodImage } from '../../services/aiVisionService';
+import { X, Camera, Image, Utensils, Check, Flame, Clock } from 'lucide-react';
+import { MealLog, AppTheme, MealType } from '../../types';
 import { StorageService } from '../../services/storageService';
 
 interface MealUploaderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  fastingState: FastingState;
-  elapsedHours: number;
+  currentTheme?: AppTheme;
   onMealAdded: (meal: MealLog) => void;
-  onStopFastingRequest?: () => void;
 }
 
-const PRESET_SAMPLES = [
-  {
-    name: '🥗 고단백 아보카도 샐러드',
-    desc: '수비드 닭가슴살 + 아보카도 + 삶은달걀',
-    url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    name: '☕ 아이스 아메리카노 (0kcal)',
-    desc: '무가당 블랙 커피 (단식 유지)',
-    url: 'https://images.unsplash.com/photo-1517256064527-09c73fc73e38?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    name: '🥩 소고기 스테이크 & 구운 채소',
-    desc: '부채살 스테이크 + 아스파라거스',
-    url: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    name: '🍰 딸기 조각 케이크 (단순당)',
-    desc: '혈당 스파이크 고위험 디저트',
-    url: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80',
-  }
+const MEAL_TYPES: { type: MealType; label: string; emoji: string }[] = [
+  { type: 'LUNCH', label: '점심', emoji: '🍱' },
+  { type: 'DINNER', label: '저녁', emoji: '🥗' },
+  { type: 'BREAKFAST', label: '아침', emoji: '🍳' },
+  { type: 'SNACK', label: '간식/음료', emoji: '☕' },
 ];
 
 export const MealUploaderModal: React.FC<MealUploaderModalProps> = ({
   isOpen,
   onClose,
-  fastingState,
-  elapsedHours,
+  currentTheme = 'pastel',
   onMealAdded,
-  onStopFastingRequest,
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [mealDescription, setMealDescription] = useState('');
-  const [mealType, setMealType] = useState<'lunch' | 'dinner' | 'breakfast' | 'snack' | 'drink'>('lunch');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AIAnalysisResult | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [mealType, setMealType] = useState<MealType>('LUNCH');
+  const [menuName, setMenuName] = useState('');
+  const [calories, setCalories] = useState('650');
+  const [carbs, setCarbs] = useState('65');
+  const [protein, setProtein] = useState('32');
+  const [fat, setFat] = useState('18');
+  const [memo, setMemo] = useState('');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isLight = currentTheme !== 'dark';
 
   if (!isOpen) return null;
 
-  const handleImageFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result as string;
-      setSelectedImage(base64);
-      runAnalysis(base64);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handlePresetSelect = (preset: typeof PRESET_SAMPLES[0]) => {
-    setSelectedImage(preset.url);
-    setMealDescription(preset.name);
-    runAnalysis(preset.url, preset.name);
-  };
-
-  const runAnalysis = async (imgUrlOrBase64: string, customDesc?: string) => {
-    setIsAnalyzing(true);
-    setErrorMsg(null);
-    setAnalysisResult(null);
-
-    const userProfile = StorageService.getUserProfile();
-    const now = new Date();
-    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-    try {
-      const result = await analyzeFoodImage({
-        imageBase64: imgUrlOrBase64,
-        fastingState,
-        elapsedHours,
-        currentTime,
-        apiKey: userProfile.apiKey,
-        provider: userProfile.aiProvider,
-        customMealDescription: customDesc || mealDescription,
-      });
-
-      setAnalysisResult(result);
-    } catch (err: any) {
-      console.error('Analysis failed:', err);
-      setErrorMsg('AI 분석 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsAnalyzing(false);
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleSaveMeal = () => {
-    if (!analysisResult || !selectedImage) return;
-
-    const newMeal: MealLog = {
-      logId: `meal_${Date.now()}`,
-      userId: 'user-default-1',
-      imageUrl: selectedImage,
-      consumedAt: new Date().toISOString(),
-      isDuringFasting: fastingState === 'FASTING',
-      mealType,
-      aiAnalysis: analysisResult,
-    };
-
-    StorageService.addMeal(newMeal);
-    onMealAdded(newMeal);
-
-    // 단식 중 칼로리 섭취로 공복이 깨진 경우 타이머 종료 제안
-    if (fastingState === 'FASTING' && analysisResult.fasting_impact.breaks_fast) {
-      if (onStopFastingRequest && confirm('공복이 해제되었습니다. 단식 타이머를 종료하고 식사 윈도우로 전환하시겠습니까?')) {
-        onStopFastingRequest();
-      }
+    if (!menuName.trim() && !selectedImage) {
+      alert('식단 사진을 등록하거나 메뉴명을 입력해주세요.');
+      return;
     }
 
-    // 초기화 및 닫기
+    const newMeal: MealLog = {
+      mealId: `meal_${Date.now()}`,
+      userId: 'user_local',
+      imageUrl: selectedImage || undefined,
+      mealType,
+      menuName: menuName.trim() || `${MEAL_TYPES.find(m => m.type === mealType)?.label || '식사'} 기록`,
+      calories: Number(calories) || 500,
+      carbs: Number(carbs) || 50,
+      protein: Number(protein) || 25,
+      fat: Number(fat) || 15,
+      glycemicSpikeRisk: 'LOW',
+      isFastingBroken: false,
+      aiCoachComment: memo.trim() || '영양 밸런스를 맞춘 식단 기록입니다.',
+      loggedAt: new Date().toISOString(),
+    };
+
+    StorageService.saveMeal(newMeal);
+    onMealAdded(newMeal);
+    handleClose();
+  };
+
+  const handleClose = () => {
     setSelectedImage(null);
-    setAnalysisResult(null);
-    setMealDescription('');
+    setMenuName('');
+    setMemo('');
     onClose();
   };
 
-  const isFasting = fastingState === 'FASTING';
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto glass-card rounded-3xl p-5 border border-white/10 shadow-2xl bg-[#0d1424]/95 flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className={`w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl p-5 border shadow-2xl transition-all flex flex-col ${
+        isLight ? 'bg-white text-slate-800 border-purple-100' : 'bg-[#0e1628] text-white border-white/10'
+      }`}>
         {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+        <div className={`flex items-center justify-between pb-3 border-b mb-3.5 ${
+          isLight ? 'border-slate-100' : 'border-white/10'
+        }`}>
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-400 flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
               <Camera className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white flex items-center">
-                AI Vision 식단 기록 & 분석
-                <Sparkles className="w-3.5 h-3.5 text-blue-400 ml-1.5" />
-              </h2>
-              <p className="text-[11px] text-slate-400">사진 1장으로 칼로리, 탄단지, 혈당 스파이크 자동 판별</p>
+              <h2 className="text-base font-bold">식단 사진 기록</h2>
+              <p className="text-[11px] text-slate-400">오늘 먹은 식사를 간편하게 기록하세요</p>
             </div>
           </div>
           <button
-            onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+            onClick={handleClose}
+            className={`p-1.5 rounded-full transition-colors ${
+              isLight ? 'hover:bg-slate-100 text-slate-400' : 'hover:bg-white/10 text-slate-400'
+            }`}
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Fasting context banner */}
-        <div
-          className={`p-3 rounded-xl mb-4 border flex items-center justify-between text-xs ${
-            isFasting
-              ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
-              : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-          }`}
-        >
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full animate-ping bg-current" />
-            <span>현재 상태: <strong>{isFasting ? `단식 중 (${elapsedHours.toFixed(1)}h 경과)` : '식사 윈도우'}</strong></span>
+        {/* Content Form */}
+        <div className="space-y-3.5 flex-1">
+          {/* 1. Meal Type Selector */}
+          <div>
+            <label className="text-xs font-bold text-slate-600 dark:text-slate-300 block mb-1.5">식사 구분</label>
+            <div className="grid grid-cols-4 gap-1.5">
+              {MEAL_TYPES.map((m) => (
+                <button
+                  key={m.type}
+                  type="button"
+                  onClick={() => setMealType(m.type)}
+                  className={`py-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center space-y-0.5 border ${
+                    mealType === m.type
+                      ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
+                      : isLight
+                      ? 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-purple-50'
+                      : 'bg-white/5 text-slate-300 border-white/5'
+                  }`}
+                >
+                  <span className="text-sm">{m.emoji}</span>
+                  <span>{m.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-white/10">AI 상태 동기화됨</span>
-        </div>
 
-        {/* Upload area or Image Preview */}
-        {!selectedImage ? (
-          <div className="space-y-4">
-            {/* File dropzone */}
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-700 hover:border-blue-500 rounded-2xl p-6 text-center cursor-pointer transition-all hover:bg-white/5 flex flex-col items-center justify-center space-y-2 group"
-            >
-              <div className="w-12 h-12 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 text-blue-400 flex items-center justify-center transition-colors">
-                <Upload className="w-6 h-6" />
+          {/* 2. Photo Upload or Preview */}
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className={`relative w-full h-44 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer overflow-hidden transition-all ${
+              selectedImage
+                ? 'border-purple-400'
+                : isLight
+                ? 'border-purple-200 bg-purple-50/40 hover:bg-purple-50'
+                : 'border-white/10 bg-white/5 hover:bg-white/10'
+            }`}
+          >
+            {selectedImage ? (
+              <>
+                <img src={selectedImage} alt="Preview" className="w-full h-full object-cover" />
+                <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-xl bg-black/60 backdrop-blur-md text-white text-[10px] font-bold flex items-center space-x-1">
+                  <Camera className="w-3 h-3" />
+                  <span>사진 변경</span>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center text-center p-4">
+                <div className="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center mb-2 shadow-xs">
+                  <Image className="w-6 h-6" />
+                </div>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                  음식 사진 갤러리/카메라 선택
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5">
+                  사진을 누르면 바로 불러옵니다
+                </span>
               </div>
-              <span className="text-sm font-semibold text-white">음식 사진 촬영 또는 갤러리 업로드</span>
-              <p className="text-xs text-slate-400">JPG, PNG 파일 지원</p>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
+
+          {/* 3. Menu Name & Calories Inputs */}
+          <div className="space-y-2.5">
+            <div>
+              <label className="text-xs font-bold text-slate-600 dark:text-slate-300 block mb-1">메뉴 이름</label>
               <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleImageFile(file);
-                }}
+                type="text"
+                placeholder="예: 닭가슴살 샐러드, 김치찌개, 삼겹살"
+                value={menuName}
+                onChange={(e) => setMenuName(e.target.value)}
+                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold border transition-all focus:outline-none ${
+                  isLight
+                    ? 'bg-slate-50 border-slate-200 text-slate-800 focus:border-purple-500 focus:bg-white'
+                    : 'bg-slate-800 border-slate-700 text-white'
+                }`}
               />
             </div>
 
-            {/* Quick Demo Presets */}
-            <div>
-              <span className="text-xs font-semibold text-slate-400 mb-2 block">⚡ 빠른 테스트 샘플 프리셋:</span>
-              <div className="grid grid-cols-2 gap-2">
-                {PRESET_SAMPLES.map((preset, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handlePresetSelect(preset)}
-                    className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 text-left transition-colors flex items-start space-x-2"
-                  >
-                    <img src={preset.url} alt={preset.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-white truncate">{preset.name}</div>
-                      <div className="text-[10px] text-slate-400 truncate">{preset.desc}</div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Image Preview & Change button */}
-            <div className="relative rounded-2xl overflow-hidden aspect-video border border-white/10 shadow-lg">
-              <img src={selectedImage} alt="Food preview" className="w-full h-full object-cover" />
-              {isAnalyzing && (
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-white space-y-2">
-                  <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
-                  <span className="text-sm font-semibold">Vision AI가 영양소를 스캔 중입니다...</span>
-                  <p className="text-xs text-slate-300">메뉴 식별, 칼로리 계산, 혈당 위험도 판별</p>
-                </div>
-              )}
-              <button
-                onClick={() => {
-                  setSelectedImage(null);
-                  setAnalysisResult(null);
-                }}
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 hover:bg-black/80 text-white transition-colors"
-                title="사진 다시 선택"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Analysis Results View */}
-            {analysisResult && (
-              <div className="space-y-3 animate-fade-in">
-                {/* Fasting Impact Warning Banner */}
-                <div
-                  className={`p-3 rounded-2xl border flex items-start space-x-2.5 ${
-                    analysisResult.fasting_impact.breaks_fast
-                      ? isFasting
-                        ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
-                        : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
-                      : 'bg-cyan-500/15 border-cyan-500/40 text-cyan-300'
+            {/* Quick Nutrition (Calories, Carbs, Protein, Fat) */}
+            <div className="grid grid-cols-4 gap-2">
+              <div>
+                <label className="text-[10px] text-slate-500 font-semibold block mb-1">칼로리(kcal)</label>
+                <input
+                  type="number"
+                  value={calories}
+                  onChange={(e) => setCalories(e.target.value)}
+                  className={`w-full px-2 py-2 rounded-xl text-xs font-mono font-bold border text-center ${
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-800 border-slate-700 text-white'
                   }`}
-                >
-                  {analysisResult.fasting_impact.breaks_fast && isFasting ? (
-                    <AlertTriangle className="w-5 h-5 flex-shrink-0 text-amber-400 mt-0.5" />
-                  ) : (
-                    <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-400 mt-0.5" />
-                  )}
-                  <div>
-                    <h4 className="text-xs font-bold">
-                      {analysisResult.fasting_impact.breaks_fast && isFasting
-                        ? '공복 깨짐 주의 (인슐린 자극)'
-                        : '단식 상태 영향 없음'}
-                    </h4>
-                    <p className="text-[11px] opacity-90 mt-0.5 leading-relaxed">
-                      {analysisResult.fasting_impact.status_message}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Macro Nutrition Summary Cards */}
-                <div className="glass-card rounded-2xl p-3.5 border border-white/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-white flex items-center">
-                      <Flame className="w-4 h-4 text-orange-400 mr-1" />
-                      총 칼로리: <strong className="text-orange-400 font-mono text-sm ml-1">{analysisResult.total_nutrition.calories} kcal</strong>
-                    </span>
-                    {/* Sugar spike risk badge */}
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        analysisResult.sugar_spike_risk === 'LOW'
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                          : analysisResult.sugar_spike_risk === 'MEDIUM'
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                          : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                      }`}
-                    >
-                      혈당 위험도: {analysisResult.sugar_spike_risk}
-                    </span>
-                  </div>
-
-                  {/* Carbs, Protein, Fat Bars */}
-                  <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div className="p-2 rounded-xl bg-white/5">
-                      <span className="text-slate-400 text-[10px]">탄수화물</span>
-                      <p className="font-bold text-blue-400 font-mono">{analysisResult.total_nutrition.carbs_g}g</p>
-                    </div>
-                    <div className="p-2 rounded-xl bg-white/5">
-                      <span className="text-slate-400 text-[10px]">단백질</span>
-                      <p className="font-bold text-emerald-400 font-mono">{analysisResult.total_nutrition.protein_g}g</p>
-                    </div>
-                    <div className="p-2 rounded-xl bg-white/5">
-                      <span className="text-slate-400 text-[10px]">지방</span>
-                      <p className="font-bold text-pink-400 font-mono">{analysisResult.total_nutrition.fat_g}g</p>
-                    </div>
-                  </div>
-
-                  {/* Identified Foods List */}
-                  <div className="mt-3 pt-2 border-t border-white/5">
-                    <span className="text-[11px] text-slate-400 font-semibold block mb-1.5">인식된 음식 구성:</span>
-                    <div className="space-y-1">
-                      {analysisResult.foods.map((food, idx) => (
-                        <div key={idx} className="flex items-center justify-between text-xs text-slate-300 py-0.5">
-                          <span>• {food.name} <span className="text-slate-500 text-[10px]">({food.portion})</span></span>
-                          <span className="font-mono text-slate-400">{food.calories} kcal</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Nutrition Summary Note */}
-                <div className="p-3.5 rounded-2xl bg-purple-50/70 dark:bg-blue-950/30 border border-purple-200 dark:border-blue-500/20">
-                  <div className="flex items-center space-x-1.5 text-xs font-bold text-purple-700 dark:text-blue-300 mb-1">
-                    <Sparkles className="w-3.5 h-3.5" />
-                    <span>영양 & 대사 분석 가이드</span>
-                  </div>
-                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed">
-                    {analysisResult.ai_coach_comment}
-                  </p>
-                </div>
-
-                {/* Meal Type selection */}
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <span className="text-slate-400 font-semibold">식사 유형:</span>
-                  <div className="flex space-x-1">
-                    {(['breakfast', 'lunch', 'dinner', 'snack', 'drink'] as const).map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setMealType(t)}
-                        className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors ${
-                          mealType === t ? 'bg-blue-600 text-white' : 'bg-white/5 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        {t === 'breakfast' ? '아침' : t === 'lunch' ? '점심' : t === 'dinner' ? '저녁' : t === 'snack' ? '간식' : '음료'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Save Button */}
-                <button
-                  onClick={handleSaveMeal}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-sm shadow-lg shadow-blue-500/30 flex items-center justify-center space-x-2 transition-all active:scale-[0.98]"
-                >
-                  <span>타임라인 피드에 저장하기</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                />
               </div>
-            )}
-
-            {errorMsg && (
-              <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-xs">
-                {errorMsg}
+              <div>
+                <label className="text-[10px] text-slate-500 font-semibold block mb-1">탄수화물(g)</label>
+                <input
+                  type="number"
+                  value={carbs}
+                  onChange={(e) => setCarbs(e.target.value)}
+                  className={`w-full px-2 py-2 rounded-xl text-xs font-mono font-bold border text-center ${
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-800 border-slate-700 text-white'
+                  }`}
+                />
               </div>
-            )}
+              <div>
+                <label className="text-[10px] text-slate-500 font-semibold block mb-1">단백질(g)</label>
+                <input
+                  type="number"
+                  value={protein}
+                  onChange={(e) => setProtein(e.target.value)}
+                  className={`w-full px-2 py-2 rounded-xl text-xs font-mono font-bold border text-center ${
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-800 border-slate-700 text-white'
+                  }`}
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-slate-500 font-semibold block mb-1">지방(g)</label>
+                <input
+                  type="number"
+                  value={fat}
+                  onChange={(e) => setFat(e.target.value)}
+                  className={`w-full px-2 py-2 rounded-xl text-xs font-mono font-bold border text-center ${
+                    isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-800 border-slate-700 text-white'
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Memo */}
+            <div>
+              <label className="text-[10px] text-slate-500 font-semibold block mb-1">메모 (선택)</label>
+              <input
+                type="text"
+                placeholder="식단에 대한 간단한 메모"
+                value={memo}
+                onChange={(e) => setMemo(e.target.value)}
+                className={`w-full px-3 py-2 rounded-xl text-xs border ${
+                  isLight ? 'bg-slate-50 border-slate-200' : 'bg-slate-800 border-slate-700 text-white'
+                }`}
+              />
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Action Button */}
+        <div className={`pt-3.5 mt-3 border-t ${isLight ? 'border-slate-100' : 'border-white/10'}`}>
+          <button
+            onClick={handleSaveMeal}
+            className={`w-full py-3.5 rounded-2xl font-extrabold text-xs flex items-center justify-center space-x-1.5 text-white shadow-lg active:scale-[0.98] transition-all ${
+              currentTheme === 'pastel'
+                ? 'bg-purple-600 hover:bg-purple-500 shadow-purple-500/25'
+                : 'bg-blue-600 hover:bg-blue-500 shadow-blue-500/25'
+            }`}
+          >
+            <Check className="w-4 h-4" />
+            <span>식단 저장하기</span>
+          </button>
+        </div>
       </div>
     </div>
   );
